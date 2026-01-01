@@ -2,7 +2,7 @@
 
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useConnection } from '@solana/wallet-adapter-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
@@ -11,20 +11,36 @@ export function WalletInfo() {
   const { connection } = useConnection();
   const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState(false);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
-    if (publicKey && connected) {
-      setLoading(true);
-      connection.getBalance(publicKey)
-        .then((bal) => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!publicKey || !connected) {
+      return;
+    }
+
+    isMountedRef.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true);
+
+    connection.getBalance(publicKey)
+      .then((bal) => {
+        if (isMountedRef.current) {
           setBalance(bal / LAMPORTS_PER_SOL);
           setLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        if (isMountedRef.current) {
           setLoading(false);
-        });
-    }
+        }
+      });
   }, [publicKey, connected, connection]);
 
   if (!connected) {

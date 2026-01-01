@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
 
 export default function CreateIdentityPage() {
-  const { connected, signMessage } = useWallet();
+  const { connected } = useWallet();
   const [did, setDid] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -44,7 +44,7 @@ export default function CreateIdentityPage() {
 
       alert('Identity created successfully!');
       router.push('/dashboard');
-    } catch (err) {
+    } catch {
       setError('Failed to create identity. Please try again.');
     } finally {
       setLoading(false);

@@ -9,7 +9,7 @@ import { SOLANA_RPC_URL } from '@/lib/wallet';
 
 export function WalletConnectionButton() {
   const { publicKey, connected } = useWallet();
-  const { address, setAddress, setBalance, setConnected, fetchBalance } = useWalletStore();
+  const { setAddress, setConnected, fetchBalance } = useWalletStore();
 
   // Sync wallet state with Zustand store
   useEffect(() => {

@@ -12,7 +12,7 @@ interface Identity {
 
 export function IdentityCard() {
   const { publicKey, connected } = useWallet();
-  const [identity, setIdentity] = useState<Identity | null>(null);
+  const [identity] = useState<Identity | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

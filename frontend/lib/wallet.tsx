@@ -1,6 +1,5 @@
 'use client';
 
-import { Connection } from '@solana/web3.js';
 import { useMemo } from 'react';
 import {
   ConnectionProvider,

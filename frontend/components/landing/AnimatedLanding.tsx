@@ -106,7 +106,7 @@ const HeroSection = () => (
 );
 
 interface ChapterSectionProps {
-  number: string;
+  number: number;
   title: string;
   description: {
     title: string;
@@ -191,7 +191,7 @@ export const AnimatedLanding = () => {
 
       {/* Chapter 1: Vision */}
       <ChapterSection
-        number="01"
+        number={1}
         title="The Vision"
         isLight={true}
         description={{
@@ -225,7 +225,7 @@ export const AnimatedLanding = () => {
 
       {/* Chapter 2: Technology */}
       <ChapterSection
-        number="02"
+        number={2}
         title="The Technology"
         isLight={false}
         description={{
@@ -259,7 +259,7 @@ export const AnimatedLanding = () => {
 
       {/* Chapter 3: Impact */}
       <ChapterSection
-        number="03"
+        number={3}
         title="The Impact"
         isLight={true}
         description={{
@@ -287,7 +287,7 @@ export const AnimatedLanding = () => {
 
       {/* Chapter 4: Revolution */}
       <ChapterSection
-        number="04"
+        number={4}
         title="The Revolution"
         isLight={false}
         description={{

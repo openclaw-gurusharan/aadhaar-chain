@@ -1,17 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletInfo } from '@/components/wallet/WalletInfo';
 import { IdentityCard } from '@/components/identity/IdentityCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
 
 export default function DashboardPage() {
   const { connected } = useWallet();
-  const [hasIdentity, setHasIdentity] = useState(false);
+  const [hasIdentity] = useState(false);
 
   return (
     <div className="space-y-6">
