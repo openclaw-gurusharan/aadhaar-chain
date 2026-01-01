@@ -16,13 +16,13 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         {connected && (
           <div className="flex gap-3">
-            <Button variant="outline" asChild>
+            <Button variant="outline" asChild className="border-saffron text-saffron hover:bg-saffron hover:text-saffron-foreground">
               <Link href="/credentials">View Credentials</Link>
             </Button>
-            <Button asChild>
+            <Button asChild className="btn-primary">
               <Link href="/identity/create">Create Identity</Link>
             </Button>
           </div>
@@ -30,12 +30,12 @@ export default function DashboardPage() {
       </div>
 
       {!connected && (
-        <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
+        <Card className="border-saffron/30 bg-saffron/5">
           <CardHeader>
-            <CardTitle className="text-yellow-800 dark:text-yellow-200">Wallet Required</CardTitle>
+            <CardTitle className="text-saffron">Wallet Required</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-yellow-700 dark:text-yellow-300">
+            <p className="text-saffron/80">
               Please connect your wallet to access the dashboard.
             </p>
           </CardContent>
@@ -50,27 +50,27 @@ export default function DashboardPage() {
       )}
 
       {connected && hasIdentity && (
-        <Card>
+        <Card className="metric-card">
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
+            <CardTitle className="tracking-tight">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid md:grid-cols-3 gap-4">
-            <Button variant="outline" className="h-20 flex-col" asChild>
+            <Button variant="outline" className="h-20 flex-col hover-lift" asChild>
               <Link href="/verify/aadhaar">
                 <span className="text-2xl mb-1">📄</span>
-                Verify Aadhaar
+                <span className="text-sm">Verify Aadhaar</span>
               </Link>
             </Button>
-            <Button variant="outline" className="h-20 flex-col" asChild>
+            <Button variant="outline" className="h-20 flex-col hover-lift" asChild>
               <Link href="/verify/pan">
                 <span className="text-2xl mb-1">💳</span>
-                Verify PAN
+                <span className="text-sm">Verify PAN</span>
               </Link>
             </Button>
-            <Button variant="outline" className="h-20 flex-col" asChild>
+            <Button variant="outline" className="h-20 flex-col hover-lift" asChild>
               <Link href="/credentials">
                 <span className="text-2xl mb-1">🔐</span>
-                Credentials
+                <span className="text-sm">Credentials</span>
               </Link>
             </Button>
           </CardContent>

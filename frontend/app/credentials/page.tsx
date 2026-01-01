@@ -55,7 +55,7 @@ export default function CredentialsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              You don't have any credentials yet. Complete a verification to earn your first credential.
+              You don&apos;t have any credentials yet. Complete a verification to earn your first credential.
             </p>
           </CardContent>
         </Card>

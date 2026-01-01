@@ -1,3 +1,4 @@
+@import "@solana/wallet-adapter-react-ui/styles.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -8,6 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-data: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,6 +29,8 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-saffron: var(--saffron);
+  --color-saffron-foreground: var(--saffron-foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -47,15 +51,25 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.5rem;
+
+  /* Indian Identity Palette */
+  --primary: #0052A5;
+  --primary-foreground: #FFFFFF;
+  --saffron: #FF9933;
+  --saffron-foreground: #FFFFFF;
+  --success: #138808;
+  --success-foreground: #FFFFFF;
+
+  /* Neutral base */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+
+  /* Semantic colors */
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -65,31 +79,44 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #0052A5;
+
+  /* Charts */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+
+  /* Sidebar */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #0052A5;
+  --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: #0052A5;
 }
 
 .dark {
+  /* Indian Identity Palette - Dark mode */
+  --primary: #3399FF;
+  --primary-foreground: #FFFFFF;
+  --saffron: #FFB366;
+  --saffron-foreground: #000000;
+  --success: #22CC44;
+  --success-foreground: #FFFFFF;
+
+  /* Neutral base */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+
+  /* Semantic colors */
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -99,20 +126,24 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #3399FF;
+
+  /* Charts */
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
+
+  /* Sidebar */
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #3399FF;
+  --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #3399FF;
 }
 
 @layer base {
@@ -121,5 +152,114 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
+}
+
+@layer components {
+  /* Data typography - monospace, tabular numbers */
+  .data-value {
+    @apply font-mono text-sm tabular-nums tracking-tight;
+  }
+
+  .data-label {
+    @apply text-xs text-muted-foreground uppercase tracking-wide;
+  }
+
+  .data-row {
+    @apply flex justify-between items-center py-2 border-b border-border last:border-0;
+  }
+
+  /* Metric cards with hover effect */
+  .metric-card {
+    @apply border rounded-lg p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5;
+  }
+
+  .metric-value {
+    @apply text-4xl font-bold tabular-nums tracking-tight;
+  }
+
+  .metric-label {
+    @apply text-sm text-muted-foreground uppercase tracking-wide;
+  }
+
+  /* Status indicators - direct styles */
+  .status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    display: inline-block;
+  }
+
+  .status-dot-success {
+    background-color: #138808;
+  }
+
+  .status-dot-warning {
+    background-color: #FF9933;
+  }
+
+  .status-dot-error {
+    background-color: #D32F2F;
+  }
+
+  .status-dot-muted {
+    background-color: oklch(0.556 0 0);
+  }
+
+  /* Button variants with Indian palette - direct styles */
+  .btn-primary {
+    background-color: #0052A5;
+    color: #FFFFFF;
+  }
+  .btn-primary:hover {
+    background-color: rgb(0 82 165 / 0.9);
+  }
+
+  .btn-saffron {
+    background-color: #FF9933;
+    color: #FFFFFF;
+  }
+  .btn-saffron:hover {
+    background-color: rgb(255 153 51 / 0.9);
+  }
+
+  .btn-success {
+    background-color: #138808;
+    color: #FFFFFF;
+  }
+  .btn-success:hover {
+    background-color: rgb(19 136 8 / 0.9);
+  }
+
+  /* Badge variants - direct styles */
+  .badge-verified {
+    background-color: rgb(19 136 8 / 0.1);
+    color: #138808;
+    border-color: rgb(19 136 8 / 0.2);
+  }
+
+  .badge-pending {
+    background-color: rgb(255 153 51 / 0.1);
+    color: #FF9933;
+    border-color: rgb(255 153 51 / 0.2);
+  }
+
+  .badge-rejected {
+    background-color: rgb(211 47 47 / 0.1);
+    color: #D32F2F;
+    border-color: rgb(211 47 47 / 0.2);
+  }
+
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-0.5;
+  }
+
+  /* Card section dividers */
+  .card-section {
+    @apply border-t border-border pt-4 mt-4 first:pt-0 first:mt-0 first:border-t-0;
   }
 }

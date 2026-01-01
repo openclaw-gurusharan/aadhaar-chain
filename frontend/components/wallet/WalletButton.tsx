@@ -1,23 +1,23 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { useCallback, useEffect, useMemo } from 'react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useEffect } from 'react';
 import { useWalletStore } from '@/stores/wallet';
-import { Button } from '@/components/ui/button';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection } from '@solana/web3.js';
 import { SOLANA_RPC_URL } from '@/lib/wallet';
 
 export function WalletConnectionButton() {
-  const { publicKey, disconnect, connected } = useWallet();
-  const { setVisible } = useWalletModal();
+  const { publicKey, connected } = useWallet();
   const { address, setAddress, setBalance, setConnected, fetchBalance } = useWalletStore();
 
+  // Sync wallet state with Zustand store
   useEffect(() => {
     setConnected(connected);
     setAddress(publicKey?.toBase58() ?? null);
   }, [connected, publicKey, setConnected, setAddress]);
 
+  // Fetch and track balance
   useEffect(() => {
     if (publicKey) {
       const connection = new Connection(SOLANA_RPC_URL, 'confirmed');
@@ -31,31 +31,22 @@ export function WalletConnectionButton() {
     }
   }, [publicKey, fetchBalance]);
 
-  const handleClick = useCallback(() => {
-    if (connected) {
-      disconnect();
-    } else {
-      setVisible(true);
-    }
-  }, [connected, disconnect, setVisible]);
-
-  const shortenedAddress = useMemo(() => {
-    if (!address) return '';
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  }, [address]);
-
   const balance = useWalletStore((state) => state.balance);
 
   return (
     <div className="flex items-center gap-3">
       {connected && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-muted-foreground hidden sm:block">
           {balance.toFixed(4)} SOL
         </div>
       )}
-      <Button onClick={handleClick} variant={connected ? 'outline' : 'default'}>
-        {connected ? shortenedAddress : 'Connect Wallet'}
-      </Button>
+      <WalletMultiButton
+        style={{
+          backgroundColor: '#0052A5',
+          color: '#ffffff',
+          borderRadius: '0.375rem',
+        }}
+      />
     </div>
   );
 }

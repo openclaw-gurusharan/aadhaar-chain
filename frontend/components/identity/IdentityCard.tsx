@@ -5,25 +5,41 @@ import { Badge } from '@/components/ui/badge';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useEffect, useState } from 'react';
 
+interface Identity {
+  did: string;
+  reputation: number;
+}
+
 export function IdentityCard() {
-  const { publicKey } = useWallet();
-  const [identity, setIdentity] = useState<any>(null);
+  const { publicKey, connected } = useWallet();
+  const [identity, setIdentity] = useState<Identity | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!connected) {
+      return;
+    }
     // TODO: Fetch identity from Solana program
     // For now, show placeholder
+  }, [publicKey, connected]);
+
+  // Set loading to false when not connected or after effect runs
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(false);
-  }, [publicKey]);
+  }, [connected]);
 
   if (loading) {
     return (
-      <Card>
+      <Card className="metric-card">
         <CardHeader>
-          <CardTitle>Identity Status</CardTitle>
+          <CardTitle className="text-lg">Identity Status</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Loading...</p>
+          <div className="flex items-center gap-2">
+            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+            <span className="text-muted-foreground text-sm">Loading...</span>
+          </div>
         </CardContent>
       </Card>
     );
@@ -31,12 +47,15 @@ export function IdentityCard() {
 
   if (!identity) {
     return (
-      <Card>
+      <Card className="metric-card">
         <CardHeader>
-          <CardTitle>Identity Status</CardTitle>
+          <CardTitle className="text-lg">Identity Status</CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">No identity found</p>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="status-dot-muted" />
+            <span className="text-sm">No identity found</span>
+          </div>
           <p className="text-sm text-muted-foreground">
             Create your decentralized identity to get started.
           </p>
@@ -46,27 +65,27 @@ export function IdentityCard() {
   }
 
   return (
-    <Card>
+    <Card className="metric-card">
       <CardHeader>
-        <CardTitle>Identity Status</CardTitle>
+        <CardTitle className="text-lg">Identity Status</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <p className="text-sm text-muted-foreground">DID</p>
-          <p className="font-mono text-sm">{identity.did}</p>
+        <div className="data-row">
+          <span className="data-label">DID</span>
+          <span className="data-value">{identity.did}</span>
         </div>
 
-        <div>
-          <p className="text-sm text-muted-foreground mb-2">Verifications</p>
+        <div className="card-section">
+          <p className="data-label mb-2">Verifications</p>
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">Aadhaar</Badge>
-            <Badge variant="outline">PAN</Badge>
+            <Badge className="badge-verified">Aadhaar</Badge>
+            <Badge className="badge-verified">PAN</Badge>
           </div>
         </div>
 
-        <div className="flex justify-between">
-          <span className="text-sm text-muted-foreground">Reputation</span>
-          <span className="font-semibold">{identity.reputation}</span>
+        <div className="data-row">
+          <span className="data-label">Reputation</span>
+          <span className="metric-value text-xl">{identity.reputation}</span>
         </div>
       </CardContent>
     </Card>

@@ -1,18 +1,34 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletStore } from '@/stores/wallet';
+import { useConnection } from '@solana/wallet-adapter-react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 export function WalletInfo() {
-  const { publicKey } = useWallet();
-  const { address, balance, isConnected } = useWalletStore();
+  const { publicKey, connected } = useWallet();
+  const { connection } = useConnection();
+  const [balance, setBalance] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
-  if (!isConnected) {
+  useEffect(() => {
+    if (publicKey && connected) {
+      connection.getBalance(publicKey)
+        .then((bal) => setBalance(bal / LAMPORTS_PER_SOL))
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    } else {
+      setBalance(0);
+      setLoading(false);
+    }
+  }, [publicKey, connected, connection]);
+
+  if (!connected) {
     return (
-      <Card>
+      <Card className="metric-card">
         <CardHeader>
-          <CardTitle>Wallet Status</CardTitle>
+          <CardTitle className="text-lg">Wallet Status</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">Not connected</p>
@@ -21,23 +37,33 @@ export function WalletInfo() {
     );
   }
 
+  const address = publicKey?.toBase58() || '';
+  const shortAddress = address.slice(0, 4) + '...' + address.slice(-4);
+
   return (
-    <Card>
+    <Card className="metric-card">
       <CardHeader>
-        <CardTitle>Wallet Status</CardTitle>
+        <CardTitle className="text-lg">Wallet Status</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Address:</span>
-          <span className="font-mono text-sm">{address}</span>
+      <CardContent className="space-y-4">
+        <div className="data-row">
+          <span className="data-label">Address</span>
+          <span className="data-value text-primary cursor-pointer" title={address}>
+            {shortAddress}
+          </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Balance:</span>
-          <span className="font-semibold">{balance.toFixed(4)} SOL</span>
+        <div className="data-row">
+          <span className="data-label">Balance</span>
+          <span className="metric-value text-2xl">
+            {loading ? '...' : balance.toFixed(4)} <span className="text-sm text-muted-foreground">SOL</span>
+          </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Status:</span>
-          <span className="text-green-600">Connected</span>
+        <div className="data-row">
+          <span className="data-label">Status</span>
+          <div className="flex items-center gap-2">
+            <span className="status-dot-success" />
+            <span className="text-success text-sm font-medium">Connected</span>
+          </div>
         </div>
       </CardContent>
     </Card>
