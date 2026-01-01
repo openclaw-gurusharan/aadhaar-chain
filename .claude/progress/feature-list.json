@@ -7,7 +7,7 @@
       "id": "feat-001",
       "description": "Next.js 15 project setup with Tailwind and wallet adapter dependencies",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "completed",
       "phase": 1,
       "acceptance_criteria": [
         "Next.js 15 app created with TypeScript",
@@ -142,9 +142,9 @@
       "P2": 1
     },
     "by_status": {
-      "pending": 10,
+      "pending": 9,
       "in_progress": 0,
-      "completed": 0
+      "completed": 1
     }
   }
 }
