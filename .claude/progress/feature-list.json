@@ -109,6 +109,22 @@
       ]
     },
     {
+      "id": "feat-005d",
+      "description": "Scroll-storyteller landing page with GSAP animations",
+      "priority": "P1",
+      "status": "completed",
+      "phase": 4,
+      "acceptance_criteria": [
+        "Convert aadharcha.html to React components",
+        "GSAP + ScrollTrigger animations (hero, chapters, finale)",
+        "Custom cursor with spotlight effect on dark sections",
+        "Instrument Serif typography and cream/charcoal design system",
+        "Conditional layout (full-width landing, contained app pages)",
+        "Progress bar and scroll-triggered reveals",
+        "Responsive SVG organic shape animations"
+      ]
+    },
+    {
       "id": "feat-006",
       "description": "Identity Core Solana program with DID registry",
       "priority": "P0",
@@ -175,16 +191,16 @@
     }
   ],
   "summary": {
-    "total": 13,
+    "total": 14,
     "by_priority": {
       "P0": 7,
-      "P1": 5,
+      "P1": 6,
       "P2": 1
     },
     "by_status": {
       "pending": 5,
       "in_progress": 0,
-      "completed": 8
+      "completed": 9
     }
   }
 }
