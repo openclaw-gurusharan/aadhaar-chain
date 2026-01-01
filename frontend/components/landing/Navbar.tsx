@@ -1,18 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 export const Navbar = () => {
-  const [isConnected, setIsConnected] = useState(false);
-
-  useEffect(() => {
-    // Check if wallet is connected (you can integrate with actual wallet adapter)
-    const checkWallet = () => {
-      // Placeholder for wallet connection check
-      setIsConnected(false);
-    };
-    checkWallet();
-  }, []);
+  const { connected, publicKey } = useWallet();
 
   return (
     <nav className="navbar fixed top-0 left-0 right-0 z-50 bg-[var(--cream)] border-b border-[var(--charcoal)]/5 backdrop-blur-sm">
@@ -25,13 +17,10 @@ export const Navbar = () => {
             </a>
           </div>
 
-          {/* Connect Wallet Button */}
-          <button
-            onClick={() => setIsConnected(!isConnected)}
-            className="px-6 py-2 bg-[var(--charcoal)] text-[var(--cream)] font-medium rounded-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 active:translate-y-0"
-          >
-            {isConnected ? 'Connected' : 'Connect Wallet'}
-          </button>
+          {/* Connect Wallet Button - Solana Wallet Adapter */}
+          <div className="wallet-button-wrapper">
+            <WalletMultiButton />
+          </div>
         </div>
       </div>
     </nav>
