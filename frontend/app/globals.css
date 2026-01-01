@@ -320,6 +320,12 @@
     }
   }
 
+  /* Navbar */
+  .navbar {
+    transform: translateY(0);
+    will-change: transform;
+  }
+
   /* Progress bar */
   .progress-bar {
     position: fixed;

@@ -8,8 +8,10 @@ import {
   useFinaleAnimations,
   useCustomCursor,
   useSpotlightObserver,
+  useNavbarHideOnScroll,
   initializeStrokePaths,
 } from './useGsapAnimations';
+import { Navbar } from './Navbar';
 
 const HeroSection = () => (
   <section className="hero min-h-screen flex flex-col items-center justify-center relative p-4 overflow-hidden bg-[var(--cream)]">
@@ -169,6 +171,7 @@ export const AnimatedLanding = () => {
   useFinaleAnimations();
   useCustomCursor();
   useSpotlightObserver();
+  useNavbarHideOnScroll();
 
   useEffect(() => {
     initializeStrokePaths();
@@ -176,6 +179,9 @@ export const AnimatedLanding = () => {
 
   return (
     <>
+      {/* Navbar */}
+      <Navbar />
+
       {/* Progress Bar */}
       <div className="progress-bar" />
 

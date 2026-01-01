@@ -288,3 +288,41 @@ export const initializeStrokePaths = () => {
     element.style.strokeDashoffset = String(length);
   });
 };
+
+export const useNavbarHideOnScroll = () => {
+  useEffect(() => {
+    const navbar = document.querySelector('.navbar');
+    if (!navbar) return;
+
+    let lastScrollY = 0;
+    let tl: gsap.core.Timeline | null = null;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+
+      if (scrollDirection === 'down' && currentScrollY > 100) {
+        // Scrolling down - hide navbar
+        if (tl) tl.kill();
+        tl = gsap.to('.navbar', {
+          y: -100,
+          duration: 0.3,
+          ease: 'power2.inOut',
+        });
+      } else {
+        // Scrolling up or near top - show navbar
+        if (tl) tl.kill();
+        tl = gsap.to('.navbar', {
+          y: 0,
+          duration: 0.3,
+          ease: 'power2.inOut',
+        });
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+};
