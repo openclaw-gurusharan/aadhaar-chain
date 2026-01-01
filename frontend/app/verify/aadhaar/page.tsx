@@ -70,12 +70,14 @@ export default function VerifyAadhaarPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Aadhaar Verification</h1>
-        <p className="text-muted-foreground">
-          Verify your identity using Aadhaar
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1>Aadhaar Verification</h1>
+          <p className="text-muted-foreground">
+            Verify your identity using Aadhaar
+          </p>
+        </div>
       </div>
 
       {!connected && (

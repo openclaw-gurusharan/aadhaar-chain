@@ -2,7 +2,7 @@
   "version": "1.1.0",
   "project": "identity-agent-platform",
   "created": "2026-01-01",
-  "updated": "2026-01-02",
+  "updated": "2026-01-02T02:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -139,6 +139,20 @@
       ]
     },
     {
+      "id": "feat-005f",
+      "description": "Unified page layout structure across all app routes",
+      "priority": "P1",
+      "status": "completed",
+      "phase": 4,
+      "acceptance_criteria": [
+        "Removed max-w-* mx-auto constraints from all pages",
+        "Standardized header layout: flex justify-between items-center",
+        "Consistent space-y-6 vertical spacing",
+        "Global Swiss typography (no inline text-3xl font-bold)",
+        "Updated: /verify/aadhaar, /verify/pan, /credentials, /settings, /identity/create"
+      ]
+    },
+    {
       "id": "feat-006",
       "description": "Identity Core Solana program with DID registry",
       "priority": "P0",
@@ -205,16 +219,16 @@
     }
   ],
   "summary": {
-    "total": 15,
+    "total": 16,
     "by_priority": {
       "P0": 8,
-      "P1": 6,
+      "P1": 7,
       "P2": 1
     },
     "by_status": {
       "pending": 5,
       "in_progress": 0,
-      "completed": 10
+      "completed": 11
     }
   }
 }

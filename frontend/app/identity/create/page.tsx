@@ -52,12 +52,14 @@ export default function CreateIdentityPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Create Identity</h1>
-        <p className="text-muted-foreground">
-          Create your decentralized identity on Solana
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1>Create Identity</h1>
+          <p className="text-muted-foreground">
+            Create your decentralized identity on Solana
+          </p>
+        </div>
       </div>
 
       {!connected && (

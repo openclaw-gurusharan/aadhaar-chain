@@ -69,12 +69,14 @@ export default function VerifyPanPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">PAN Verification</h1>
-        <p className="text-muted-foreground">
-          Verify your identity using PAN card
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1>PAN Verification</h1>
+          <p className="text-muted-foreground">
+            Verify your identity using PAN card
+          </p>
+        </div>
       </div>
 
       {!connected && (

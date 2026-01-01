@@ -28,8 +28,8 @@ export default function CredentialsPage() {
 
   if (!connected) {
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">Credentials</h1>
+      <div className="space-y-6">
+        <h1>Credentials</h1>
         <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
           <CardContent className="pt-6">
             <p className="text-yellow-800 dark:text-yellow-200">
@@ -42,9 +42,9 @@ export default function CredentialsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Credentials</h1>
+        <h1>Credentials</h1>
         <Button variant="outline">Add Credential</Button>
       </div>
 
