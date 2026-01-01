@@ -14,13 +14,16 @@ export function WalletInfo() {
 
   useEffect(() => {
     if (publicKey && connected) {
+      setLoading(true);
       connection.getBalance(publicKey)
-        .then((bal) => setBalance(bal / LAMPORTS_PER_SOL))
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    } else {
-      setBalance(0);
-      setLoading(false);
+        .then((bal) => {
+          setBalance(bal / LAMPORTS_PER_SOL);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setLoading(false);
+        });
     }
   }, [publicKey, connected, connection]);
 

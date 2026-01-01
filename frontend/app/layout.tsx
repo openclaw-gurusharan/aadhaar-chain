@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
-import { Navbar } from "@/components/layout/Navbar";
+import { ConditionalNavbar, ConditionalMainWrapper } from "@/components/layout/ConditionalNavbar";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  variable: "--font-instrument-serif",
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -21,13 +27,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${instrumentSerif.variable} font-sans antialiased`}>
         <Providers>
           <div className="min-h-screen bg-background">
-            <Navbar />
-            <main className="container mx-auto px-4 py-8">
+            <ConditionalNavbar />
+            <ConditionalMainWrapper>
               {children}
-            </main>
+            </ConditionalMainWrapper>
           </div>
         </Providers>
       </body>
