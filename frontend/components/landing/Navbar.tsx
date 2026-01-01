@@ -1,7 +1,13 @@
 'use client';
 
 import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import dynamic from 'next/dynamic';
+
+// Dynamically import WalletMultiButton to avoid SSR hydration issues
+const WalletMultiButton = dynamic(
+  () => import('@solana/wallet-adapter-react-ui').then(mod => mod.WalletMultiButton),
+  { ssr: false }
+);
 
 export const Navbar = () => {
   const { connected, publicKey } = useWallet();
