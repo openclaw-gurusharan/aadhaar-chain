@@ -1,7 +1,8 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "project": "identity-agent-platform",
   "created": "2026-01-01",
+  "updated": "2026-01-01",
   "features": [
     {
       "id": "feat-001",
@@ -69,11 +70,50 @@
       ]
     },
     {
+      "id": "feat-005a",
+      "description": "Hybrid UI design system with Indian identity palette",
+      "priority": "P1",
+      "status": "completed",
+      "phase": 4,
+      "acceptance_criteria": [
+        "Indian flag color palette (blue #0052A5, saffron #FF9933, green #138808)",
+        "Custom CSS layer with .data-value, .metric-card, .status-dot classes",
+        "Tabular numbers for data displays",
+        "Swiss design tokens (tight tracking, subtle hover effects)"
+      ]
+    },
+    {
+      "id": "feat-005b",
+      "description": "API client structure with axios and type definitions",
+      "priority": "P0",
+      "status": "completed",
+      "phase": 4,
+      "acceptance_criteria": [
+        "Axios instance with base URL and interceptors",
+        "Modular API structure (identity, verification, credentials)",
+        "TypeScript types for requests/responses",
+        "Error handling with retry logic"
+      ]
+    },
+    {
+      "id": "feat-005c",
+      "description": "Mobile navigation and responsive fixes",
+      "priority": "P1",
+      "status": "completed",
+      "phase": 4,
+      "acceptance_criteria": [
+        "Sheet-based mobile menu",
+        "Responsive breakpoint handling",
+        "Touch-friendly button sizing",
+        "Fixed WalletInfo Zustand store bug"
+      ]
+    },
+    {
       "id": "feat-006",
       "description": "Identity Core Solana program with DID registry",
       "priority": "P0",
       "status": "pending",
-      "phase": 6,
+      "phase": 5,
       "acceptance_criteria": [
         "create_identity instruction",
         "update_commitment instruction",
@@ -86,7 +126,7 @@
       "description": "Credential Vault Solana program for verifiable credentials",
       "priority": "P1",
       "status": "pending",
-      "phase": 6,
+      "phase": 5,
       "acceptance_criteria": [
         "issue_credential instruction",
         "revoke_credential instruction",
@@ -99,7 +139,7 @@
       "description": "Document Processor MCP server with OCR",
       "priority": "P0",
       "status": "pending",
-      "phase": 7,
+      "phase": 6,
       "acceptance_criteria": [
         "parse_aadhaar tool",
         "parse_pan tool",
@@ -112,7 +152,7 @@
       "description": "Document Validator Claude agent",
       "priority": "P0",
       "status": "pending",
-      "phase": 8,
+      "phase": 7,
       "acceptance_criteria": [
         "Agent SDK integration",
         "MCP tool calls",
@@ -125,7 +165,7 @@
       "description": "FastAPI gateway with JWT auth",
       "priority": "P1",
       "status": "pending",
-      "phase": 9,
+      "phase": 8,
       "acceptance_criteria": [
         "JWT authentication",
         "Rate limiting",
@@ -135,16 +175,16 @@
     }
   ],
   "summary": {
-    "total": 10,
+    "total": 13,
     "by_priority": {
-      "P0": 6,
-      "P1": 3,
+      "P0": 7,
+      "P1": 5,
       "P2": 1
     },
     "by_status": {
       "pending": 5,
       "in_progress": 0,
-      "completed": 5
+      "completed": 8
     }
   }
 }
