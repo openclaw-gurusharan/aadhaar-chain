@@ -6,7 +6,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const useProgressBar = () => {
   useEffect(() => {
-    gsap.to('.progress-bar', {
+    const progressBar = document.querySelector('.progress-bar');
+    if (!progressBar) return;
+
+    gsap.to(progressBar, {
       scaleX: 1,
       ease: 'none',
       scrollTrigger: {
@@ -23,86 +26,108 @@ export const useHeroAnimations = () => {
   useEffect(() => {
     const heroTl = gsap.timeline();
 
+    // Check if we're on landing page
+    const heroTitle = document.querySelector('.hero-title');
+    if (!heroTitle) return;
+
     // Fragmented identity
-    heroTl.to(
-      '.fragmented-identity .organic-path',
-      {
-        opacity: 0.15,
-        duration: 1.2,
-        stagger: 0.15,
-        ease: 'power2.out',
-      },
-      0
-    );
+    const fragmentedPaths = document.querySelectorAll('.fragmented-identity .organic-path');
+    if (fragmentedPaths.length > 0) {
+      heroTl.to(
+        fragmentedPaths,
+        {
+          opacity: 0.15,
+          duration: 1.2,
+          stagger: 0.15,
+          ease: 'power2.out',
+        },
+        0
+      );
+    }
 
     // Unified identity core
-    heroTl.to(
-      '.unified-identity .organic-path:nth-child(1)',
-      {
-        opacity: 0.18,
-        scale: 1,
-        duration: 0.8,
-        ease: 'back.out(1.3)',
-      },
-      0.3
-    );
+    const unifiedCore = document.querySelector('.unified-identity .organic-path:nth-child(1)');
+    if (unifiedCore) {
+      heroTl.to(
+        unifiedCore,
+        {
+          opacity: 0.18,
+          scale: 1,
+          duration: 0.8,
+          ease: 'back.out(1.3)',
+        },
+        0.3
+      );
+    }
 
     // Radiance lines
-    heroTl.to(
-      '.unified-identity .organic-path:nth-of-type(n+2):nth-of-type(-n+5)',
-      {
-        strokeDasharray: 200,
-        strokeDashoffset: 200,
-        opacity: 0.1,
-        duration: 1,
-        ease: 'power2.inOut',
-      },
-      0.3
-    );
+    const radianceLines = document.querySelectorAll('.unified-identity .organic-path:nth-of-type(n+2):nth-of-type(-n+5)');
+    if (radianceLines.length > 0) {
+      heroTl.to(
+        radianceLines,
+        {
+          strokeDasharray: 200,
+          strokeDashoffset: 200,
+          opacity: 0.1,
+          duration: 1,
+          ease: 'power2.inOut',
+        },
+        0.3
+      );
 
-    heroTl.to(
-      '.unified-identity .organic-path:nth-of-type(n+2):nth-of-type(-n+5)',
-      {
-        strokeDashoffset: 0,
-        duration: 1.2,
-        stagger: 0.1,
-        ease: 'power2.inOut',
-      },
-      0.4
-    );
+      heroTl.to(
+        radianceLines,
+        {
+          strokeDashoffset: 0,
+          duration: 1.2,
+          stagger: 0.1,
+          ease: 'power2.inOut',
+        },
+        0.4
+      );
+    }
 
     // Text animations
-    heroTl.to(
-      '.hero-title .word',
-      {
-        y: 0,
-        opacity: 1,
-        duration: 1.2,
-        stagger: 0.06,
-        ease: 'power3.out',
-      },
-      0.4
-    );
+    const words = document.querySelectorAll('.hero-title .word');
+    if (words.length > 0) {
+      heroTl.to(
+        words,
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          stagger: 0.06,
+          ease: 'power3.out',
+        },
+        0.4
+      );
+    }
 
-    heroTl.to(
-      '.hero-subtitle',
-      {
-        opacity: 1,
-        duration: 1,
-        ease: 'power2.inOut',
-      },
-      0.7
-    );
+    const subtitle = document.querySelector('.hero-subtitle');
+    if (subtitle) {
+      heroTl.to(
+        subtitle,
+        {
+          opacity: 1,
+          duration: 1,
+          ease: 'power2.inOut',
+        },
+        0.7
+      );
+    }
 
-    heroTl.to(
-      '.scroll-indicator',
-      {
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power2.inOut',
-      },
-      0.9
-    );
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    if (scrollIndicator) {
+      heroTl.to(
+        scrollIndicator,
+        {
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.inOut',
+        },
+        0.9
+      );
+    }
   }, []);
 };
 
@@ -187,25 +212,33 @@ export const useChapterAnimations = () => {
 
 export const useFinaleAnimations = () => {
   useEffect(() => {
-    gsap.from('.finale-illustration', {
-      opacity: 0,
-      scale: 0.85,
-      duration: 1.2,
-      scrollTrigger: {
-        trigger: '.finale',
-        start: 'top 70%',
-      },
-    });
+    const finaleIllustration = document.querySelector('.finale-illustration');
+    const finale = document.querySelector('.finale');
 
-    gsap.from('.finale > div:last-child', {
-      opacity: 0,
-      y: 40,
-      duration: 1,
-      scrollTrigger: {
-        trigger: '.finale',
-        start: 'top 60%',
-      },
-    });
+    if (finaleIllustration && finale) {
+      gsap.from(finaleIllustration, {
+        opacity: 0,
+        scale: 0.85,
+        duration: 1.2,
+        scrollTrigger: {
+          trigger: finale,
+          start: 'top 70%',
+        },
+      });
+    }
+
+    const finaleContent = finale?.querySelector(':scope > div:last-child');
+    if (finaleContent && finale) {
+      gsap.from(finaleContent, {
+        opacity: 0,
+        y: 40,
+        duration: 1,
+        scrollTrigger: {
+          trigger: finale,
+          start: 'top 60%',
+        },
+      });
+    }
   }, []);
 };
 
@@ -295,7 +328,7 @@ export const useNavbarHideOnScroll = () => {
     if (!navbar) return;
 
     let lastScrollY = 0;
-    let tl: gsap.core.Timeline | null = null;
+    let tl: gsap.core.Tween | null = null;
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;

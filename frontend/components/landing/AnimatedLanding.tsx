@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import {
   useProgressBar,
   useHeroAnimations,
@@ -165,6 +166,8 @@ const Illustration = ({ children }: IllustrationProps) => (
 );
 
 export const AnimatedLanding = () => {
+  const { connected } = useWallet();
+
   useProgressBar();
   useHeroAnimations();
   useChapterAnimations();
@@ -176,6 +179,11 @@ export const AnimatedLanding = () => {
   useEffect(() => {
     initializeStrokePaths();
   }, []);
+
+  // Don't render landing page if wallet is connected
+  if (connected) {
+    return null;
+  }
 
   return (
     <>

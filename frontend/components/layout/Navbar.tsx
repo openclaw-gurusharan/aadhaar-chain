@@ -35,7 +35,6 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/identity/create', label: 'Create Identity' },
     { href: '/verify/aadhaar', label: 'Verify Aadhaar' },
@@ -47,22 +46,22 @@ export function Navbar() {
   const handleNavClick = () => setOpen(false);
 
   return (
-    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 pointer-events-none">
+    <nav className="border-b border-[var(--charcoal)]/5 bg-[var(--cream)] backdrop-blur-sm sticky top-0 z-50 pointer-events-none">
       <div className="container mx-auto px-4 pointer-events-auto">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8 pointer-events-auto">
-            <Link href="/" className="text-xl font-bold tracking-tight" onClick={handleNavClick}>
-              Identity Agent
+            <Link href="/" className="text-lg font-semibold text-[var(--charcoal)] tracking-tight hover:opacity-80 transition-opacity" onClick={handleNavClick}>
+              AadhaarChain
             </Link>
             <div className="hidden md:flex items-center gap-6">
               {links.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`text-sm transition-colors hover:text-foreground/80 ${
+                  className={`text-sm transition-colors duration-200 hover:opacity-80 ${
                     pathname === link.href
-                      ? 'text-foreground font-medium'
-                      : 'text-foreground/60'
+                      ? 'text-[var(--charcoal)] font-medium'
+                      : 'text-[var(--charcoal)]/60'
                   }`}
                 >
                   {link.label}
@@ -75,14 +74,14 @@ export function Navbar() {
             {/* Mobile menu trigger */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+                <Button variant="ghost" size="icon" className="md:hidden text-[var(--charcoal)] hover:bg-[var(--charcoal)]/5" aria-label="Open menu">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[320px]">
+              <SheetContent side="right" className="w-[280px] sm:w-[320px] bg-[var(--cream)] border-[var(--charcoal)]/10">
                 <SheetHeader>
-                  <SheetTitle>Navigation</SheetTitle>
-                  <SheetDescription>
+                  <SheetTitle className="text-[var(--charcoal)]">Navigation</SheetTitle>
+                  <SheetDescription className="text-[var(--charcoal)]/60">
                     Quick access to all pages
                   </SheetDescription>
                 </SheetHeader>
@@ -92,10 +91,10 @@ export function Navbar() {
                       key={link.href}
                       href={link.href}
                       onClick={handleNavClick}
-                      className={`text-lg transition-colors hover:text-primary py-2 border-b border-border/50 last:border-0 ${
+                      className={`text-base transition-colors duration-200 hover:opacity-80 py-2 border-b border-[var(--charcoal)]/8 last:border-0 ${
                         pathname === link.href
-                          ? 'text-primary font-semibold'
-                          : 'text-foreground/70'
+                          ? 'text-[var(--charcoal)] font-semibold'
+                          : 'text-[var(--charcoal)]/70'
                       }`}
                     >
                       {link.label}

@@ -15,13 +15,13 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1>Dashboard</h1>
         {connected && (
           <div className="flex gap-3">
-            <Button variant="outline" asChild className="border-saffron text-saffron hover:bg-saffron hover:text-saffron-foreground">
+            <Button variant="outline" asChild>
               <Link href="/credentials">View Credentials</Link>
             </Button>
-            <Button asChild className="btn-primary">
+            <Button variant="default" asChild>
               <Link href="/identity/create">Create Identity</Link>
             </Button>
           </div>
@@ -29,12 +29,12 @@ export default function DashboardPage() {
       </div>
 
       {!connected && (
-        <Card className="border-saffron/30 bg-saffron/5">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-saffron">Wallet Required</CardTitle>
+            <CardTitle>Wallet Required</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-saffron/80">
+            <p className="text-muted-foreground">
               Please connect your wallet to access the dashboard.
             </p>
           </CardContent>
@@ -51,7 +51,7 @@ export default function DashboardPage() {
       {connected && hasIdentity && (
         <Card className="metric-card">
           <CardHeader>
-            <CardTitle className="tracking-tight">Quick Actions</CardTitle>
+            <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid md:grid-cols-3 gap-4">
             <Button variant="outline" className="h-20 flex-col hover-lift" asChild>
