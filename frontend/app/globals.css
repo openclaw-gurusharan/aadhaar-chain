@@ -390,6 +390,10 @@
     overflow-y: auto !important;
   }
 
+  .wallet-adapter-modal-wrapper {
+    background-color: transparent !important;
+  }
+
   .wallet-adapter-modal-title {
     color: var(--charcoal) !important;
     opacity: 1 !important;
