@@ -392,6 +392,17 @@
 
   .wallet-adapter-modal-title {
     color: var(--charcoal) !important;
+    opacity: 1 !important;
+  }
+
+  .wallet-adapter-modal-title h2 {
+    color: var(--charcoal) !important;
+    opacity: 1 !important;
+  }
+
+  .wallet-adapter-modal h2 {
+    color: var(--charcoal) !important;
+    opacity: 1 !important;
   }
 
   .wallet-adapter-modal-middle {
