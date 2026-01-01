@@ -62,3 +62,54 @@ Smart decision-tracing system to learn from past issues and apply solutions:
 | css | Styling and layout issues | Theme colors, responsive design |
 
 **Recent Traces:** Query similar issues before solving new problems - system learns from every fix
+
+## Architectural Choices Decision Traces
+
+Capture architectural decisions in context graph for institutional knowledge and pattern reuse:
+
+| Step | Action | Tool | When to Use |
+| --- | --- | --- | --- |
+| 1 | Complete feature implementation | - | After finishing significant work |
+| 2 | Identify key architectural choice | - | Framework selection, pattern decision, integration approach |
+| 3 | Document decision rationale | - | Why this approach vs alternatives |
+| 4 | Store trace with category | `context_store_trace(decision, category, outcome)` | Always mark as "success" for completed work |
+| 5 | Link to feature ID | Pass `feature_id` param | Enables querying by feature later |
+| 6 | Query future decisions | `context_query_traces(query, category)` | Before making similar architectural choices |
+
+**Capture Trigger Examples:**
+
+| Situation | Example Trace | Category |
+| --- | --- | --- |
+| Choose animation library | "Selected GSAP + ScrollTrigger over Framer Motion for scroll performance and SVG control" | `frontend` |
+| Design system decision | "Integrated cream/charcoal theme using CSS custom properties for dual-system support" | `css` |
+| Layout architecture | "Implemented conditional layout pattern: hides navbar on landing, shows on app routes" | `framework` |
+| Component patterns | "Converted 1000-line HTML to modular React: logic in hooks, UI in components, styles in CSS" | `frontend` |
+| State management | "Chose Zustand over Redux for identity state: simpler API, smaller bundle, sufficient for use cases" | `framework` |
+| MCP integration | "Built custom MCP servers for pattern-analyzer and compliance-rules with async processing" | `architecture` |
+
+**Query Examples:**
+
+```bash
+# Find animation decisions
+context_query_traces(query="animation library", category="frontend")
+
+# Find design system patterns
+context_query_traces(query="design system", category="css")
+
+# Find layout patterns
+context_query_traces(query="conditional layout", category="framework")
+
+# Find all architectural decisions
+context_query_traces(query="architecture", limit=20)
+```
+
+**Categories for Architectural Decisions:**
+
+| Category | Use For | Examples |
+| --- | --- | --- |
+| `frontend` | UI patterns, component architecture, rendering decisions | Custom cursor, scroll animations, reusable hooks |
+| `css` | Design system, theming, styling approaches | CSS variables, Tailwind integration, responsive patterns |
+| `framework` | Layout patterns, routing, application structure | Conditional rendering, page organization, navigation |
+| `architecture` | MCP servers, agent design, system integration | Data flow, communication patterns, service boundaries |
+| `testing` | Test strategy, automation patterns, validation approach | Component testing, E2E strategies, verification methods |
+| `deployment` | Build strategy, environment setup, release process | Build optimization, environment config, CI/CD choices |
