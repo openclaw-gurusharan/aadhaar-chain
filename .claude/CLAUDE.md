@@ -41,27 +41,50 @@ Identity Agent Platform - Solana + Claude Agent SDK
 
 ## Issue Resolution Workflow
 
-Smart decision-tracing system to learn from past issues and apply solutions:
+**CRITICAL ENFORCEMENT:** Context graph is your FIRST tool, not your last. DO NOT skip to fixing.
 
-| Step | Action | Tool |
-| --- | --- | --- |
-| 1 | Query context graph for similar issues | `context_query_traces(query, category)` |
-| 2 | If found: apply learned solution pattern | Review `trace_id` and outcome |
-| 3 | If not found: investigate and find fix | Debug using browser-testing skill |
-| 4 | Apply fix and test in browser | Verify no regressions |
-| 5 | Log decision trace with outcome | `context_store_trace(decision, category, outcome)` |
+| Step | Action | Tool | MANDATORY |
+| --- | --- | --- | --- |
+| 1 | **IMMEDIATELY** query context graph for similar issues | `context_query_traces(query="error description", category=...)` | 🔴 YES |
+| 2 | If found: apply learned solution pattern from trace | Review `trace_id`, `decision`, `outcome` | 🔴 YES |
+| 3 | If not found: investigate root cause | Debug using browser-testing or code inspection | ✓ |
+| 4 | Implement fix and verify no regressions | Test in browser, check console for errors | ✓ |
+| 5 | **IMMEDIATELY log trace** (do NOT batch) | `context_store_trace(decision, category, outcome="success")` | 🔴 YES |
+
+**Enforcement Rules:**
+
+- ❌ Do NOT investigate before querying traces
+- ❌ Do NOT batch log traces (log after EACH fix)
+- ❌ Do NOT treat context graph as post-work documentation
+- ✓ DO query traces BEFORE touching code
+- ✓ DO log traces IMMEDIATELY after fix completes
+- ✓ DO treat context graph as active working memory
 
 **Decision Trace Categories:**
 
-| Category | Use For | Example Outcomes |
-| --- | --- | --- |
-| frontend | UI/component issues, rendering, interactions | WalletModal overlay blocking clicks |
-| hydration | React server/client mismatches | Wallet adapter SSR incompatibility |
-| framework | Architecture & pattern decisions | Next.js dynamic imports |
-| testing | Test automation & validation workflows | Browser automation setup |
-| css | Styling and layout issues | Theme colors, responsive design |
+| Category | Use For | Query Pattern | Example Issues |
+| --- | --- | --- | --- |
+| `frontend` | UI/component issues, rendering, interactions | `query="render error"` | WalletModal overlay, cascading renders, hydration mismatches |
+| `hydration` | React server/client mismatches | `query="hydration mismatch"` | Wallet adapter SSR, useEffect issues |
+| `framework` | Architecture & pattern decisions | `query="architecture pattern"` | Next.js routing, conditional rendering |
+| `testing` | Test automation & validation workflows | `query="test automation"` | Browser testing setup, E2E patterns |
+| `css` | Styling and layout issues | `query="layout"` | Theme colors, responsive breakpoints |
+| `deployment` | Build/server errors | `query="build error"` | Server crashes, process management |
 
-**Recent Traces:** Query similar issues before solving new problems - system learns from every fix
+**When to Query:**
+
+- ❌ Error appears → DO NOT fix immediately
+- ✓ Error appears → Query context graph first with error message as search term
+- ✓ Same error occurs twice → You should have found the trace the second time
+- ✓ Before implementing new pattern → Search if similar pattern exists
+
+**Reflexive Querying (Active Working Memory):**
+
+- Every error → Query before investigating (check for learned patterns first)
+- Every fix → Log immediately (don't wait for end-of-session batch)
+- Every debug session → Start with context graph search (semantic similarity finds related issues)
+- Test if second occurrence of error → You failed if trace wasn't found the first time
+- Architectural decision → Query similar decisions before designing
 
 ## Architectural Choices Decision Traces
 
