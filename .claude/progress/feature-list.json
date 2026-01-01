@@ -1,0 +1,150 @@
+{
+  "version": "1.0.0",
+  "project": "identity-agent-platform",
+  "created": "2026-01-01",
+  "features": [
+    {
+      "id": "feat-001",
+      "description": "Next.js 15 project setup with Tailwind and wallet adapter dependencies",
+      "priority": "P0",
+      "status": "in_progress",
+      "phase": 1,
+      "acceptance_criteria": [
+        "Next.js 15 app created with TypeScript",
+        "Tailwind CSS configured",
+        "@solana/wallet-adapter-react installed",
+        "shadcn/ui initialized"
+      ]
+    },
+    {
+      "id": "feat-002",
+      "description": "Wallet connection UI with connect/disconnect and balance display",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 1,
+      "acceptance_criteria": [
+        "WalletConnectionButton component",
+        "Phantom/Solflare adapter support",
+        "Display connected wallet address",
+        "Display SOL balance"
+      ]
+    },
+    {
+      "id": "feat-003",
+      "description": "Identity creation page with document upload",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 2,
+      "acceptance_criteria": [
+        "Document upload form",
+        "Aadhaar/PAN selection",
+        "Client-side preview",
+        "Submit for verification button"
+      ]
+    },
+    {
+      "id": "feat-004",
+      "description": "Identity dashboard showing DID and verification status",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 2,
+      "acceptance_criteria": [
+        "Display DID",
+        "Verification bitmap visualization",
+        "Last updated timestamp",
+        "Credential count"
+      ]
+    },
+    {
+      "id": "feat-005",
+      "description": "Verification flow page with progress tracking",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 3,
+      "acceptance_criteria": [
+        "Step-by-step progress UI",
+        "Real-time status updates",
+        "Error handling with retry",
+        "Success confirmation"
+      ]
+    },
+    {
+      "id": "feat-006",
+      "description": "Identity Core Solana program with DID registry",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "create_identity instruction",
+        "update_commitment instruction",
+        "set_verification_bit instruction",
+        "recover_identity instruction"
+      ]
+    },
+    {
+      "id": "feat-007",
+      "description": "Credential Vault Solana program for verifiable credentials",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "issue_credential instruction",
+        "revoke_credential instruction",
+        "verify_zk_proof instruction",
+        "PDA-based credential storage"
+      ]
+    },
+    {
+      "id": "feat-008",
+      "description": "Document Processor MCP server with OCR",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 7,
+      "acceptance_criteria": [
+        "parse_aadhaar tool",
+        "parse_pan tool",
+        "OCR integration",
+        "Field extraction"
+      ]
+    },
+    {
+      "id": "feat-009",
+      "description": "Document Validator Claude agent",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 8,
+      "acceptance_criteria": [
+        "Agent SDK integration",
+        "MCP tool calls",
+        "Document parsing workflow",
+        "Validation response"
+      ]
+    },
+    {
+      "id": "feat-010",
+      "description": "FastAPI gateway with JWT auth",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 9,
+      "acceptance_criteria": [
+        "JWT authentication",
+        "Rate limiting",
+        "Agent proxy endpoints",
+        "Health check endpoint"
+      ]
+    }
+  ],
+  "summary": {
+    "total": 10,
+    "by_priority": {
+      "P0": 6,
+      "P1": 3,
+      "P2": 1
+    },
+    "by_status": {
+      "pending": 10,
+      "in_progress": 0,
+      "completed": 0
+    }
+  }
+}
