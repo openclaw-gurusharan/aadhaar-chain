@@ -1,6 +1,24 @@
-# Identity Agent Platform
+# Identity & Asset Tokenization Platform
 
-Self-sovereign identity on Solana powered by Claude Agent SDK.
+Self-sovereign identity and asset tokenization infrastructure on Solana, powered by Claude Agent SDK.
+
+> **Purpose:** See `.summary/PURPOSE.md` for the complete problem statement, two-phase vision, and market opportunity.
+
+## Vision
+
+**Phase 1 (Current):** Credential Tokenization
+
+- Pull credentials via API Setu (Aadhaar, PAN, DL, Land Records, Education)
+- Store as verified tokens on Solana
+- Grant selective, time-bound access to services
+
+**Phase 2 (Roadmap):** Asset Tokenization Foundation
+
+- Verified identity enables asset tokenization (real estate, credentials)
+- Maharashtra ₹50T opportunity: identity layer for tokenized state
+- BlackRock's "missing guardrail": digital identity verification
+
+**Positioning:** Layer 1 of the tokenization stack. Before assets can be tokenized, ownership must be verified.
 
 ## Architecture
 
