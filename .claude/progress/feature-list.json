@@ -1,8 +1,8 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "project": "identity-agent-platform",
   "created": "2026-01-01",
-  "updated": "2026-01-02T02:00:00Z",
+  "updated": "2026-01-02T12:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -154,10 +154,151 @@
     },
     {
       "id": "feat-006",
-      "description": "Identity Core Solana program with DID registry",
+      "description": "FastAPI gateway scaffold with config and health endpoint",
       "priority": "P0",
       "status": "pending",
       "phase": 5,
+      "acceptance_criteria": [
+        "gateway/ directory structure created",
+        "requirements.txt with fastapi, uvicorn, claude-agent-sdk, solders",
+        "config.py with environment variable loading",
+        "main.py with CORS, health endpoint",
+        ".env.example with required variables"
+      ]
+    },
+    {
+      "id": "feat-007",
+      "description": "Pydantic models for identity, verification, and credentials",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "Identity model matching frontend types",
+        "AadhaarVerificationData and PanVerificationData models",
+        "VerificationStatus with steps and progress",
+        "Credential model with claims",
+        "ApiResponse wrapper for consistent responses"
+      ]
+    },
+    {
+      "id": "feat-008",
+      "description": "Document Processor MCP tools with Tesseract OCR",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "@tool decorated ocr function",
+        "@tool decorated extract_fields function",
+        "Tesseract integration via pytesseract",
+        "Aadhaar field extraction (name, DOB, UID)",
+        "PAN field extraction (name, PAN number, DOB)",
+        "create_sdk_mcp_server for document-processor"
+      ]
+    },
+    {
+      "id": "feat-009",
+      "description": "Pattern Analyzer and Compliance Rules MCP tools",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "detect_tampering tool (image hash, metadata checks)",
+        "check_watchlist tool (mock implementation)",
+        "check_aadhaar_act tool (consent, purpose validation)",
+        "check_dpdp tool (data minimization rules)",
+        "MCP servers for pattern-analyzer and compliance-rules"
+      ]
+    },
+    {
+      "id": "feat-010",
+      "description": "Agent definitions for Document Validator, Fraud Detection, Compliance",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "AgentDefinition for document-validator with MCP tools",
+        "AgentDefinition for fraud-detection with pattern tools",
+        "AgentDefinition for compliance-monitor with compliance tools",
+        "Clear descriptions for auto-delegation",
+        "Tool restrictions per agent (no Task in subagents)"
+      ]
+    },
+    {
+      "id": "feat-011",
+      "description": "Orchestrator agent with verification workflow",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "ClaudeAgentOptions with Task tool enabled",
+        "Subagent coordination flow",
+        "verify_aadhaar workflow (parse → fraud → compliance)",
+        "verify_pan workflow",
+        "Result aggregation and decision logic"
+      ]
+    },
+    {
+      "id": "feat-012",
+      "description": "Verification routes with status tracking",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "POST /{walletAddress}/aadhaar endpoint",
+        "POST /{walletAddress}/pan endpoint",
+        "GET /status/{verificationId} endpoint",
+        "In-memory verification status store",
+        "Progress updates during agent workflow"
+      ]
+    },
+    {
+      "id": "feat-013",
+      "description": "Identity and Transaction routes",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "GET /api/identity/{walletAddress}",
+        "POST /api/identity/{walletAddress} (mock tx preparation)",
+        "PATCH /api/identity/{walletAddress}",
+        "POST /api/transaction/prepare",
+        "POST /api/transaction/submit"
+      ]
+    },
+    {
+      "id": "feat-014",
+      "description": "Credentials routes for issuance and revocation",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "GET /api/credentials/{walletAddress}",
+        "POST /api/credentials/{walletAddress}",
+        "DELETE /api/credentials/{walletAddress}/{credentialId}",
+        "In-memory credential store (mock)",
+        "Credential claims structure"
+      ]
+    },
+    {
+      "id": "feat-015",
+      "description": "Solana service layer with solders/anchorpy",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "RPC client initialization",
+        "Transaction preparation (unsigned for frontend)",
+        "Transaction submission",
+        "PDA derivation for identity accounts",
+        "Balance and account info queries"
+      ]
+    },
+    {
+      "id": "feat-016",
+      "description": "Identity Core Solana program with DID registry",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 7,
       "acceptance_criteria": [
         "create_identity instruction",
         "update_commitment instruction",
@@ -166,11 +307,11 @@
       ]
     },
     {
-      "id": "feat-007",
+      "id": "feat-017",
       "description": "Credential Vault Solana program for verifiable credentials",
       "priority": "P1",
       "status": "pending",
-      "phase": 5,
+      "phase": 7,
       "acceptance_criteria": [
         "issue_credential instruction",
         "revoke_credential instruction",
@@ -179,56 +320,36 @@
       ]
     },
     {
-      "id": "feat-008",
-      "description": "Document Processor MCP server with OCR",
-      "priority": "P0",
-      "status": "pending",
-      "phase": 6,
-      "acceptance_criteria": [
-        "parse_aadhaar tool",
-        "parse_pan tool",
-        "OCR integration",
-        "Field extraction"
-      ]
-    },
-    {
-      "id": "feat-009",
-      "description": "Document Validator Claude agent",
-      "priority": "P0",
-      "status": "pending",
-      "phase": 7,
-      "acceptance_criteria": [
-        "Agent SDK integration",
-        "MCP tool calls",
-        "Document parsing workflow",
-        "Validation response"
-      ]
-    },
-    {
-      "id": "feat-010",
-      "description": "FastAPI gateway with JWT auth",
+      "id": "feat-018",
+      "description": "End-to-end integration and testing",
       "priority": "P1",
       "status": "pending",
       "phase": 8,
       "acceptance_criteria": [
-        "JWT authentication",
-        "Rate limiting",
-        "Agent proxy endpoints",
-        "Health check endpoint"
+        "Frontend to backend API integration",
+        "Backend to Solana program integration",
+        "Full verification flow test",
+        "Error handling across layers"
       ]
     }
   ],
   "summary": {
-    "total": 16,
+    "total": 22,
     "by_priority": {
-      "P0": 8,
-      "P1": 7,
-      "P2": 1
+      "P0": 12,
+      "P1": 10
     },
     "by_status": {
-      "pending": 5,
+      "pending": 11,
       "in_progress": 0,
       "completed": 11
+    },
+    "by_phase": {
+      "1-4": "Frontend (completed)",
+      "5": "Backend + Agent SDK",
+      "6": "Solana Service Layer",
+      "7": "Solana Programs",
+      "8": "Integration"
     }
   }
 }

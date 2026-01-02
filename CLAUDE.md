@@ -74,17 +74,76 @@ Self-sovereign identity on Solana powered by Claude Agent SDK.
 
 ## Token Efficiency
 
-- Use `mcp__token-efficient__execute_code` for sandbox execution
-- Progressive disclosure for agent configs
-- Hash commitments instead of on-chain PII (928 → 32 bytes)
+**CRITICAL**: Proactively use token-efficient MCP tools BEFORE expensive operations.
 
-## Implementation Phases
+| Instead of | Use This | When | Savings |
+| :--- | :--- | :--- | :--- |
+| `Bash` (code exec) | `mcp__token-efficient__execute_code` | Python/Bash/Node code | 98% |
+| `Bash` (load CSV) | `mcp__token-efficient__process_csv` | >50 rows, filtering | 99% |
+| `Bash` (grep logs) | `mcp__token-efficient__process_logs` | Pattern matching | 95% |
+| `Read` (large files) | `Read` with offset/limit | Files >100 lines | 90% |
+| Multiple CSVs | `mcp__token-efficient__batch_process_csv` | 2-5 files | 80% |
 
-| Phase | Focus | Status |
-|-------|-------|--------|
-| 1-5 | Frontend (Next.js + wallet) | pending |
-| 6-7 | Solana programs | pending |
-| 7-8 | MCP servers | pending |
-| 8-9 | Claude agents | pending |
-| 9-10 | FastAPI gateway | pending |
-| 11-12 | Integration | pending |
+**Priority Rule**: If operation processes >50 items, MUST use token-efficient MCP.
+
+**Available Tools**:
+
+- `execute_code` - Python/Bash/Node in sandbox
+- `process_csv` - Filter, aggregate, paginate CSV
+- `batch_process_csv` - Multiple CSVs with same filter
+- `process_logs` - Pattern match with pagination
+- `search_tools` - Find MCP tools by keyword (95% savings)
+
+## Bug Fix Verification
+
+**CRITICAL**: Human verification required before logging successful decision traces.
+
+### Workflow
+
+```text
+Bug Found → Query Context Graph → No trace?
+                                      ↓
+                        Fix issue → Browser test → Agent: "Fixed!"
+                                                    ↓
+                                    AskUserQuestion (verify)
+                                                    ↓
+                         ┌──────────────────┬────────────────┬────────────────┐
+                         │                  │                │                │
+                      YES (Fixed)        NO (Broken)    EXPLAIN          OTHER
+                         │                  │                │                │
+                    Log trace          Try again        Get details      Handle case
+                  outcome="success"      with fix          │               appropriately
+                                                        Retry fix
+```
+
+### User Verification Prompt
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "I've fixed the issue. Can you verify in browser that it's resolved?",
+        "header": "Verify Fix",
+        "options": [
+            {"label": "Yes, fixed", "description": "Issue is resolved, log to decision traces"},
+            {"label": "No, still broken", "description": "Issue persists, try again"},
+            {"label": "Explain more", "description": "Provide additional context"}
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+### Rules
+
+| Action | When | Outcome |
+| :--- | :--- | :--- |
+| Log trace with `outcome: "success"` | User confirms "Yes, fixed" | ✅ Allowed |
+| Log trace with `outcome: "failure"` | Multiple failed attempts | ✅ Allowed |
+| Log trace with `outcome: "pending"` | Before user verification | ✅ Allowed |
+| Log trace with `outcome: "success"` | Without user verification | ❌ Blocked |
+
+### Context Graph Clean Data
+
+- Only verified fixes logged as `success`
+- Prevents garbage data in learning system
+- Human is ultimate source of truth
