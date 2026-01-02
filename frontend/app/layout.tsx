@@ -3,6 +3,7 @@ import { Inter, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers/Providers";
 import { ConditionalNavbar, ConditionalMainWrapper } from "@/components/layout/ConditionalNavbar";
+import { ToastContainer } from "@/components/ui/Toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
               {children}
             </ConditionalMainWrapper>
           </div>
+          <ToastContainer />
         </Providers>
       </body>
     </html>

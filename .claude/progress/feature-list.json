@@ -315,7 +315,7 @@
       "id": "feat-015",
       "description": "Frontend to backend integration",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 8,
       "acceptance_criteria": [
         "Connect frontend API client to FastAPI routes",
@@ -361,9 +361,9 @@
       "P1": 4
     },
     "by_status": {
-      "pending": 5,
+      "pending": 4,
       "in_progress": 0,
-      "completed": 14
+      "completed": 15
     },
     "by_phase": {
       "1-4": "Frontend (completed)",

@@ -1,20 +1,30 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { toast } from '@/stores/toast';
 import type {
-  Identity,
-  CreateIdentityRequest,
-  CreateIdentityResponse,
-  AadhaarVerificationData,
-  PanVerificationData,
-  VerificationResponse,
+  IdentityResponse,
+  CredentialResponse,
   VerificationStatus,
-  Credential,
-  CredentialRequest,
-  TransactionResponse,
+  OverallVerificationStatus,
+  AccessGrant,
+  CreateIdentityRequest,
+  UpdateIdentityRequest,
+  CredentialData,
+  CreateGrantRequest,
+  UnsignedTransaction,
+  TransactionReceipt,
   ApiResponse,
 } from './types';
 
 // API base URL from env or default
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+// Retry configuration
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
+const RETRYABLE_STATUS = [500, 502, 503, 504];
+
+// Sleep helper for retry delay
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
@@ -25,174 +35,406 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor - add auth token if available
+// Store for wallet signature callback
+let walletSignCallback: ((message: string) => Promise<string>) | null = null;
+
+/**
+ * Set the wallet signing callback for authentication
+ * This should be called when wallet is connected
+ */
+export function setWalletSignCallback(callback: (message: string) => Promise<string>) {
+  walletSignCallback = callback;
+}
+
+/**
+ * Clear the wallet signing callback
+ */
+export function clearWalletSignCallback() {
+  walletSignCallback = null;
+}
+
+// Request interceptor - add wallet signature auth
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    // Add wallet signature or JWT token here when available
-    const token = localStorage.getItem('auth_token');
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config: InternalAxiosRequestConfig) => {
+    // Add wallet signature for authentication if available
+    if (walletSignCallback && config.headers) {
+      try {
+        // Create timestamp for nonce
+        const timestamp = Date.now();
+        const message = `Sign this message to authenticate with Identity Platform\nTimestamp: ${timestamp}`;
+
+        const signature = await walletSignCallback(message);
+        config.headers['X-Wallet-Address'] = signature; // This should be wallet address
+        config.headers['X-Wallet-Signature'] = signature;
+        config.headers['X-Timestamp'] = timestamp.toString();
+      } catch (error) {
+        console.error('Failed to sign request:', error);
+      }
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor - handle errors globally
+// Response interceptor - handle errors with retry logic
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<ApiResponse<never>>) => {
+  async (error: AxiosError<ApiResponse<never>>) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: number };
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
+    // Initialize retry counter
+    if (originalRequest._retry === undefined) {
+      originalRequest._retry = 0;
+    }
+
+    const status = error.response?.status;
+
+    // Check if error is retryable
+    if (
+      status &&
+      RETRYABLE_STATUS.includes(status) &&
+      originalRequest._retry < MAX_RETRIES
+    ) {
+      originalRequest._retry += 1;
+      const delay = RETRY_DELAY_MS * Math.pow(2, originalRequest._retry - 1); // Exponential backoff
+
+      console.warn(`Retrying request (attempt ${originalRequest._retry}/${MAX_RETRIES}) after ${delay}ms`);
+
+      await sleep(delay);
+      return apiClient(originalRequest);
+    }
+
+    // Handle error responses
     if (error.response) {
-      // Server responded with error status
-      console.error('API Error:', error.response.data);
+      const data = error.response.data as ApiResponse<never>;
+      const errorMessage = typeof data.error === 'string' ? data.error : data.error?.message || error.message;
+
+      // Show toast for user-facing errors
+      if (status !== 401 && status !== 403) {
+        toast.error(errorMessage);
+      }
+
+      console.error('API Error:', { status, errorMessage });
     } else if (error.request) {
       // Request made but no response
+      const errorMessage = 'Network error. Please check your connection.';
+      toast.error(errorMessage);
       console.error('Network Error:', error.message);
     } else {
       // Error setting up request
+      toast.error(error.message || 'An error occurred');
       console.error('Request Error:', error.message);
     }
+
     return Promise.reject(error);
   }
 );
 
 // ===== IDENTITY MODULE =====
 export const identityApi = {
-  // Get identity by wallet address
-  async getIdentity(walletAddress: string): Promise<Identity> {
-    const { data } = await apiClient.get<ApiResponse<Identity>>(
+  /**
+   * Get identity by wallet address
+   */
+  async getIdentity(walletAddress: string): Promise<IdentityResponse> {
+    const { data } = await apiClient.get<ApiResponse<IdentityResponse>>(
       `/api/identity/${walletAddress}`
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to fetch identity');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch identity');
+    }
+
     return data.data;
   },
 
-  // Create new identity
+  /**
+   * Create new identity
+   */
   async createIdentity(
     walletAddress: string,
     request: CreateIdentityRequest
-  ): Promise<CreateIdentityResponse> {
-    const { data } = await apiClient.post<ApiResponse<CreateIdentityResponse>>(
+  ): Promise<UnsignedTransaction> {
+    const { data } = await apiClient.post<ApiResponse<UnsignedTransaction>>(
       `/api/identity/${walletAddress}`,
       request
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to create identity');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to create identity');
+    }
+
     return data.data;
   },
 
-  // Update identity commitment
+  /**
+   * Update identity commitment
+   */
   async updateCommitment(
     walletAddress: string,
-    commitment: string
-  ): Promise<{ signature: string }> {
-    const { data } = await apiClient.patch<ApiResponse<{ signature: string }>>(
+    request: UpdateIdentityRequest
+  ): Promise<UnsignedTransaction> {
+    const { data } = await apiClient.patch<ApiResponse<UnsignedTransaction>>(
       `/api/identity/${walletAddress}`,
-      { commitment }
+      request
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to update commitment');
-    return data.data;
-  },
-};
 
-// ===== VERIFICATION MODULE =====
-export const verificationApi = {
-  // Submit Aadhaar verification
-  async submitAadhaar(
-    walletAddress: string,
-    verificationData: AadhaarVerificationData
-  ): Promise<VerificationResponse> {
-    const { data } = await apiClient.post<ApiResponse<VerificationResponse>>(
-      `/api/verification/${walletAddress}/aadhaar`,
-      verificationData
-    );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to submit verification');
-    return data.data;
-  },
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to update identity');
+    }
 
-  // Submit PAN verification
-  async submitPan(
-    walletAddress: string,
-    verificationData: PanVerificationData
-  ): Promise<VerificationResponse> {
-    const { data } = await apiClient.post<ApiResponse<VerificationResponse>>(
-      `/api/verification/${walletAddress}/pan`,
-      verificationData
-    );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to submit verification');
-    return data.data;
-  },
-
-  // Get verification status
-  async getStatus(verificationId: string): Promise<VerificationStatus> {
-    const { data } = await apiClient.get<ApiResponse<VerificationStatus>>(
-      `/api/verification/status/${verificationId}`
-    );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to fetch status');
     return data.data;
   },
 };
 
 // ===== CREDENTIALS MODULE =====
 export const credentialsApi = {
-  // Get all credentials for wallet
-  async getCredentials(walletAddress: string): Promise<Credential[]> {
-    const { data } = await apiClient.get<ApiResponse<Credential[]>>(
+  /**
+   * Get all credentials for wallet
+   */
+  async getCredentials(walletAddress: string): Promise<CredentialResponse[]> {
+    const { data } = await apiClient.get<ApiResponse<CredentialResponse[]>>(
       `/api/credentials/${walletAddress}`
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to fetch credentials');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch credentials');
+    }
+
     return data.data;
   },
 
-  // Issue new credential
-  async issueCredential(
+  /**
+   * Fetch from API Setu and tokenize credential
+   */
+  async fetchAndTokenize(
     walletAddress: string,
-    request: CredentialRequest
-  ): Promise<Credential> {
-    const { data } = await apiClient.post<ApiResponse<Credential>>(
+    request: CredentialData
+  ): Promise<CredentialResponse> {
+    const { data } = await apiClient.post<ApiResponse<CredentialResponse>>(
       `/api/credentials/${walletAddress}`,
       request
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to issue credential');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch credential');
+    }
+
     return data.data;
   },
 
-  // Revoke credential
+  /**
+   * Get specific credential by type
+   */
+  async getCredential(walletAddress: string, credentialType: string): Promise<CredentialResponse> {
+    const { data } = await apiClient.get<ApiResponse<CredentialResponse>>(
+      `/api/credentials/${walletAddress}/${credentialType}`
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch credential');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Revoke credential
+   */
   async revokeCredential(
     walletAddress: string,
     credentialId: string
-  ): Promise<{ revoked: boolean }> {
-    const { data } = await apiClient.delete<ApiResponse<{ revoked: boolean }>>(
+  ): Promise<{ message: string }> {
+    const { data } = await apiClient.delete<ApiResponse<{ message: string }>>(
       `/api/credentials/${walletAddress}/${credentialId}`
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to revoke credential');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to revoke credential');
+    }
+
+    toast.success('Credential revoked successfully');
+    return data.data;
+  },
+};
+
+// ===== VERIFICATION MODULE =====
+export const verificationApi = {
+  /**
+   * Get overall verification status for wallet
+   */
+  async getOverallStatus(walletAddress: string): Promise<OverallVerificationStatus> {
+    const { data } = await apiClient.get<ApiResponse<OverallVerificationStatus>>(
+      `/api/verification/${walletAddress}/status`
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch verification status');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Get specific verification status
+   */
+  async getVerificationStatus(verificationId: string): Promise<VerificationStatus> {
+    const { data } = await apiClient.get<ApiResponse<VerificationStatus>>(
+      `/api/verification/${verificationId}`
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch verification status');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Start verification process
+   */
+  async startVerification(
+    walletAddress: string,
+    credentialType: string
+  ): Promise<VerificationStatus> {
+    const { data } = await apiClient.post<ApiResponse<VerificationStatus>>(
+      `/api/verification/${walletAddress}/${credentialType}`
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to start verification');
+    }
+
+    toast.info('Verification started');
+    return data.data;
+  },
+
+  /**
+   * Update verification progress (internal use)
+   */
+  async updateProgress(
+    verificationId: string,
+    progress: number,
+    stepName?: string,
+    stepStatus?: string,
+    message?: string
+  ): Promise<VerificationStatus> {
+    const { data } = await apiClient.patch<ApiResponse<VerificationStatus>>(
+      `/api/verification/${verificationId}/progress`,
+      { progress, step_name: stepName, step_status: stepStatus, message }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to update progress');
+    }
+
     return data.data;
   },
 };
 
 // ===== TRANSACTION MODULE =====
 export const transactionApi = {
-  // Prepare unsigned transaction
+  /**
+   * Prepare unsigned transaction
+   */
   async prepareTransaction(
-    walletAddress: string,
-    instruction: string,
-    params: Record<string, unknown>
-  ): Promise<{ transaction: string }> {
-    const { data } = await apiClient.post<ApiResponse<{ transaction: string }>>(
-      `/api/transaction/prepare`,
-      { walletAddress, instruction, params }
+    instructions: unknown[],
+    payer: string
+  ): Promise<UnsignedTransaction> {
+    const { data } = await apiClient.post<ApiResponse<UnsignedTransaction>>(
+      '/api/transaction/prepare',
+      { instructions, payer }
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to prepare transaction');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to prepare transaction');
+    }
+
     return data.data;
   },
 
-  // Submit signed transaction
-  async submitTransaction(signedTransaction: string): Promise<TransactionResponse> {
-    const { data } = await apiClient.post<ApiResponse<TransactionResponse>>(
+  /**
+   * Submit signed transaction
+   */
+  async submitTransaction(signedTransaction: string): Promise<TransactionReceipt> {
+    const { data } = await apiClient.post<ApiResponse<TransactionReceipt>>(
       '/api/transaction/submit',
       { transaction: signedTransaction }
     );
-    if (!data.data) throw new Error(data.error?.message || 'Failed to submit transaction');
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to submit transaction');
+    }
+
+    if (data.data.status === 'success') {
+      toast.success('Transaction submitted successfully');
+    } else {
+      toast.error(data.data.error || 'Transaction failed');
+    }
+
     return data.data;
+  },
+};
+
+// ===== ACCESS GRANTS MODULE =====
+export const grantsApi = {
+  /**
+   * Create access grant
+   */
+  async createGrant(walletAddress: string, request: CreateGrantRequest): Promise<AccessGrant> {
+    const { data } = await apiClient.post<ApiResponse<AccessGrant>>(
+      `/api/grant/${walletAddress}`,
+      request
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to create grant');
+    }
+
+    toast.success('Access granted successfully');
+    return data.data;
+  },
+
+  /**
+   * List active grants for wallet
+   */
+  async listGrants(walletAddress: string): Promise<AccessGrant[]> {
+    const { data } = await apiClient.get<ApiResponse<AccessGrant[]>>(
+      `/api/grants/${walletAddress}`
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to fetch grants');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Revoke access grant
+   */
+  async revokeGrant(walletAddress: string, grantId: string): Promise<{ message: string }> {
+    const { data } = await apiClient.delete<ApiResponse<{ message: string }>>(
+      `/api/grants/${walletAddress}/${grantId}`
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to revoke grant');
+    }
+
+    toast.success('Access revoked successfully');
+    return data.data;
+  },
+};
+
+// ===== HEALTH CHECK =====
+export const healthApi = {
+  async check(): Promise<{ status: string; version: string }> {
+    const { data } = await apiClient.get<{ status: string; version: string }>('/api/health');
+    return data;
   },
 };
 

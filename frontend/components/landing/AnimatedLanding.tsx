@@ -113,7 +113,6 @@ const HeroSection = () => (
 
 interface ChapterSectionProps {
   number: number;
-  title: string;
   label: string;
   description: {
     title: string;
@@ -123,7 +122,7 @@ interface ChapterSectionProps {
   children: React.ReactNode;
 }
 
-const ChapterSection = ({ number, title, label, description, isLight, children }: ChapterSectionProps) => (
+const ChapterSection = ({ number, label, description, isLight, children }: ChapterSectionProps) => (
   <section className={`chapter ${isLight ? 'light' : 'dark'} min-h-screen flex items-center justify-center relative p-6 md:p-12 ${isLight ? 'bg-[var(--cream)] text-[var(--charcoal)]' : 'bg-[var(--charcoal)] text-[var(--cream)]'}`}>
     <span className={`chapter-number absolute top-4 left-4 md:top-8 md:left-8 font-serif italic opacity-[0.08] font-normal`}
           style={{ fontSize: 'clamp(6rem, 15vw, 12rem)', lineHeight: 1 }}>
@@ -227,7 +226,6 @@ export const AnimatedLanding = () => {
       {/* Chapter 1: Vision */}
       <ChapterSection
         number={1}
-        title="The Vision"
         label="The Vision"
         isLight={true}
         description={{
@@ -272,7 +270,6 @@ export const AnimatedLanding = () => {
       {/* Chapter 2: Technology */}
       <ChapterSection
         number={2}
-        title="The Technology"
         label="The Technology"
         isLight={false}
         description={{
@@ -325,7 +322,6 @@ export const AnimatedLanding = () => {
       {/* Chapter 3: Impact */}
       <ChapterSection
         number={3}
-        title="The Impact"
         label="The Impact"
         isLight={true}
         description={{
@@ -374,7 +370,6 @@ export const AnimatedLanding = () => {
       {/* Chapter 4: Revolution */}
       <ChapterSection
         number={4}
-        title="The Revolution"
         label="The Revolution"
         isLight={false}
         description={{
