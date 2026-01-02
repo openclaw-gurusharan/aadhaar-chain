@@ -1,3 +1,70 @@
+# Kilocode
 .kilocode
-# Local Netlify folder
+
+# Netlify
 .netlify
+
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+dist/
+build/
+
+# Solana / Anchor
+target/
+*.so
+*.rbf
+.anchor/
+test-ledger/
+.solana-test-validator/
+
+# MCP Servers
+.mcp/traces/
+.mcp/cache/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Temporary
+*.tmp
+.tmp/
+/tmp/
+
+# Summary (optional, uncomment if you want to ignore)
+# .summary/

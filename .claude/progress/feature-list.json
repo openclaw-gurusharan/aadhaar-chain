@@ -156,7 +156,7 @@
       "id": "feat-006",
       "description": "FastAPI gateway scaffold with Claude Agent SDK foundation",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "gateway/ directory structure created",
@@ -170,7 +170,7 @@
       "id": "feat-007",
       "description": "Pydantic models for identity, credentials, and tokenization",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "Identity model matching frontend types",
@@ -184,7 +184,7 @@
       "id": "feat-008",
       "description": "API Setu integration service for credential fetching",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "API Setu client with authentication",
@@ -201,7 +201,7 @@
       "id": "feat-008a",
       "description": "Identity routes (create, fetch, update DID on Solana)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "GET /api/identity/{walletAddress} - fetch identity from Solana",
@@ -215,7 +215,7 @@
       "id": "feat-009",
       "description": "Credential routes (fetch, tokenize, list)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "GET /api/credentials/{walletAddress} - list all credential tokens",
@@ -229,7 +229,7 @@
       "id": "feat-009a",
       "description": "Transaction routes (prepare unsigned tx, submit signed tx)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "POST /api/transaction/prepare - build unsigned transaction from instruction",
@@ -243,7 +243,7 @@
       "id": "feat-010",
       "description": "Access grant routes (selective disclosure, time-bound)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "POST /api/grant/{walletAddress} - grant access to service",
@@ -257,7 +257,7 @@
       "id": "feat-011",
       "description": "Verification status routes (progress tracking)",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "GET /api/verification/{walletAddress}/status - overall status",
@@ -270,7 +270,7 @@
       "id": "feat-012",
       "description": "Solana service layer with solders library",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 6,
       "acceptance_criteria": [
         "RPC client initialization (devnet/mainnet)",
@@ -361,9 +361,9 @@
       "P1": 4
     },
     "by_status": {
-      "pending": 14,
+      "pending": 5,
       "in_progress": 0,
-      "completed": 5
+      "completed": 14
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
