@@ -12,7 +12,6 @@ import {
   useCustomCursor,
   useSpotlightObserver,
   useNavbarHideOnScroll,
-  initializeStrokePaths,
 } from './useGsapAnimations';
 import { Navbar } from './Navbar';
 
@@ -27,33 +26,33 @@ const HeroSection = () => (
     >
       <g className="fragmented-identity">
         <path
-          className="organic-path"
+          className="fill-path"
           d="M 150 300 Q 130 320 140 360 L 160 400 Q 170 420 195 415 L 210 375 Q 215 335 195 315 Z"
           fill="#141413"
-          opacity="0.15"
+          opacity="0"
         />
         <path
-          className="organic-path"
+          className="fill-path"
           d="M 280 250 Q 265 270 275 310 L 295 350 Q 305 370 330 365 L 345 325 Q 350 285 330 265 Z"
           fill="#141413"
-          opacity="0.12"
+          opacity="0"
         />
       </g>
 
       <g className="unified-identity">
         <path
-          className="organic-path"
+          className="fill-path"
           d="M 700 400 Q 660 430 675 490 Q 695 550 770 560 Q 845 550 865 490 Q 880 430 840 400 Z"
           fill="#141413"
-          opacity="0.18"
+          opacity="0"
         />
         <path
-          className="organic-path"
+          className="draw-path"
           d="M 770 320 Q 800 380 770 440"
           fill="none"
           stroke="#141413"
           strokeWidth="2"
-          opacity="0.1"
+          opacity="0"
         />
       </g>
     </svg>
@@ -115,6 +114,7 @@ const HeroSection = () => (
 interface ChapterSectionProps {
   number: number;
   title: string;
+  label: string;
   description: {
     title: string;
     paragraphs: string[];
@@ -123,10 +123,11 @@ interface ChapterSectionProps {
   children: React.ReactNode;
 }
 
-const ChapterSection = ({ number, title, description, isLight, children }: ChapterSectionProps) => (
+const ChapterSection = ({ number, title, label, description, isLight, children }: ChapterSectionProps) => (
   <section className={`chapter ${isLight ? 'light' : 'dark'} min-h-screen flex items-center justify-center relative p-6 md:p-12 ${isLight ? 'bg-[var(--cream)] text-[var(--charcoal)]' : 'bg-[var(--charcoal)] text-[var(--cream)]'}`}>
-    <span className={`chapter-number absolute top-0 left-0 text-8xl md:text-9xl font-serif opacity-[0.04] font-normal`}>
-      {number}
+    <span className={`chapter-number absolute top-4 left-4 md:top-8 md:left-8 font-serif italic opacity-[0.08] font-normal`}
+          style={{ fontSize: 'clamp(6rem, 15vw, 12rem)', lineHeight: 1 }}>
+      {String(number).padStart(2, '0')}
     </span>
 
     <div className="chapter-inner grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 max-w-6xl w-full relative z-10">
@@ -134,8 +135,11 @@ const ChapterSection = ({ number, title, description, isLight, children }: Chapt
         <>
           {children}
           <div className="chapter-content">
-            <p className="landing-label mb-2">{title}</p>
-            <h2 className="landing-h2">{description.title}</h2>
+            <p className="chapter-label text-xs md:text-sm font-semibold uppercase tracking-[0.2em] opacity-50 mb-4 flex items-center gap-4">
+              <span className="w-10 h-px bg-current opacity-50"></span>
+              {label}
+            </p>
+            <h2 className={`landing-h2 ${isLight ? 'text-[var(--charcoal)]' : 'text-[var(--cream)]'}`}>{description.title}</h2>
             <div className="chapter-description mt-6 space-y-4 text-sm md:text-base opacity-85">
               {description.paragraphs.map((para: string, i: number) => (
                 <p key={i}>{para}</p>
@@ -146,8 +150,11 @@ const ChapterSection = ({ number, title, description, isLight, children }: Chapt
       ) : (
         <>
           <div className="chapter-content">
-            <p className="landing-label mb-2">{title}</p>
-            <h2 className="landing-h2">{description.title}</h2>
+            <p className="chapter-label text-xs md:text-sm font-semibold uppercase tracking-[0.2em] opacity-50 mb-4 flex items-center gap-4">
+              <span className="w-10 h-px bg-current opacity-50"></span>
+              {label}
+            </p>
+            <h2 className={`landing-h2 ${isLight ? 'text-[var(--charcoal)]' : 'text-[var(--cream)]'}`}>{description.title}</h2>
             <div className="chapter-description mt-6 space-y-4 text-sm md:text-base opacity-85">
               {description.paragraphs.map((para: string, i: number) => (
                 <p key={i}>{para}</p>
@@ -183,9 +190,6 @@ export const AnimatedLanding = () => {
   useEffect(() => {
     // Reset scroll position when component mounts (especially after wallet disconnect)
     window.scrollTo(0, 0);
-
-    // Initialize stroke paths for SVG animations
-    initializeStrokePaths();
 
     // Refresh ScrollTrigger to recalculate positions after mount
     ScrollTrigger.refresh();
@@ -224,6 +228,7 @@ export const AnimatedLanding = () => {
       <ChapterSection
         number={1}
         title="The Vision"
+        label="The Vision"
         isLight={true}
         description={{
           title: 'One identity.\nInfinite possibility.',
@@ -235,87 +240,31 @@ export const AnimatedLanding = () => {
         }}
       >
         <Illustration>
-          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[550px]">
-            {/* Central core */}
-            <path
-              className="organic-path"
-              d="M 200 200 Q 160 220 170 270 Q 185 310 250 320 Q 315 310 330 270 Q 340 220 300 200 Z"
-              fill="#141413"
-              opacity="0"
-              style={{ transform: 'scale(0.8)', transformOrigin: 'center' }}
-            />
-            {/* Radiating line - top */}
-            <path
-              className="organic-path"
-              d="M 250 200 Q 260 140 250 80"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - top right */}
-            <path
-              className="organic-path"
-              d="M 290 210 Q 340 160 390 120"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - right */}
-            <path
-              className="organic-path"
-              d="M 330 260 Q 380 255 430 250"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - bottom right */}
-            <path
-              className="organic-path"
-              d="M 300 310 Q 350 360 400 400"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - bottom */}
-            <path
-              className="organic-path"
-              d="M 250 320 Q 245 380 250 440"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - bottom left */}
-            <path
-              className="organic-path"
-              d="M 200 310 Q 150 360 100 400"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - left */}
-            <path
-              className="organic-path"
-              d="M 170 260 Q 120 255 70 250"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
-            {/* Radiating line - top left */}
-            <path
-              className="organic-path"
-              d="M 210 210 Q 160 160 110 120"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="2"
-              opacity="0"
-            />
+          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[500px]">
+            {/* Person at center - YOU (head) */}
+            <circle className="fill-path" cx="250" cy="140" r="35" fill="#141413" opacity="0"/>
+            {/* Person body */}
+            <path className="fill-path" d="M 215 180 Q 200 220 210 280 Q 230 320 250 325 Q 270 320 290 280 Q 300 220 285 180 Q 270 170 250 170 Q 230 170 215 180"
+                  fill="#141413" opacity="0"/>
+            {/* Radiating lines to possibilities */}
+            <path className="draw-path" d="M 250 105 L 250 50" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 280 120 L 340 80" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 290 150 L 360 150" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 280 180 L 350 220" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 265 210 L 320 280" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 235 210 L 180 280" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 220 180 L 150 220" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 210 150 L 140 150" stroke="#141413" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 220 120 L 160 80" stroke="#141413" strokeWidth="2" opacity="0"/>
+            {/* Labels */}
+            <text className="label-path" x="250" y="40" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Global</text>
+            <text className="label-path" x="355" y="70" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Work</text>
+            <text className="label-path" x="380" y="150" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Travel</text>
+            <text className="label-path" x="370" y="225" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Bank</text>
+            <text className="label-path" x="330" y="300" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Services</text>
+            <text className="label-path" x="170" y="300" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Rights</text>
+            <text className="label-path" x="130" y="225" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Health</text>
+            <text className="label-path" x="145" y="150" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">Education</text>
           </svg>
         </Illustration>
       </ChapterSection>
@@ -324,6 +273,7 @@ export const AnimatedLanding = () => {
       <ChapterSection
         number={2}
         title="The Technology"
+        label="The Technology"
         isLight={false}
         description={{
           title: 'Architecture of trust.',
@@ -335,21 +285,39 @@ export const AnimatedLanding = () => {
         }}
       >
         <Illustration>
-          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[550px]">
-            <path
-              className="organic-path"
-              d="M 60 100 Q 40 120 50 170 L 80 220 Q 95 240 125 230 L 140 170 Q 145 120 115 105 Z"
-              fill="#FAF9F5"
-              opacity="0.8"
-            />
-            <path
-              className="organic-path"
-              d="M 150 170 Q 200 160 250 165"
-              fill="none"
-              stroke="#FAF9F5"
-              strokeWidth="3"
-              opacity="0.6"
-            />
+          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[500px]">
+            {/* Aadhaar Document - left */}
+            <path className="fill-path" d="M 60 200 L 60 260 Q 60 270 70 270 L 130 270 Q 140 270 140 260 L 140 210 Q 140 200 130 200 Z"
+                  fill="#FAF9F5" opacity="0"/>
+            <path className="draw-path" d="M 75 220 L 110 220" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 75 235 L 95 235" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <text className="label-path" x="100" y="295" textAnchor="middle" fontSize="11" fill="#FAF9F5" opacity="0">Aadhaar</text>
+
+            {/* Arrow to lock */}
+            <path className="draw-path" d="M 140 235 L 180 235" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+
+            {/* Lock - center-left */}
+            <rect className="fill-path" x="185" y="215" width="45" height="40" rx="4" fill="#FAF9F5" opacity="0"/>
+            <path className="draw-path" d="M 195 215 L 195 200 Q 195 188 207 188 Q 219 188 219 200 L 219 215"
+                  stroke="#FAF9F5" strokeWidth="5" opacity="0"/>
+            <text className="label-path" x="207" y="280" textAnchor="middle" fontSize="11" fill="#FAF9F5" opacity="0">Encrypted</text>
+
+            {/* Arrow to blockchain */}
+            <path className="draw-path" d="M 230 235 L 270 235" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+
+            {/* Blockchain blocks - center */}
+            <rect className="fill-path" x="275" y="215" width="40" height="40" rx="4" fill="#FAF9F5" opacity="0"/>
+            <rect className="fill-path" x="320" y="215" width="40" height="40" rx="4" fill="#FAF9F5" opacity="0"/>
+            <rect className="fill-path" x="365" y="215" width="40" height="40" rx="4" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="340" y="280" textAnchor="middle" fontSize="11" fill="#FAF9F5" opacity="0">Solana</text>
+
+            {/* Arrow to verified - curves down */}
+            <path className="draw-path" d="M 340 255 Q 340 320 280 350" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+
+            {/* Verified badge - bottom */}
+            <circle className="fill-path" cx="250" cy="370" r="35" fill="#FAF9F5" opacity="0"/>
+            <path className="draw-path" d="M 235 370 L 245 380 L 270 355" stroke="#141413" strokeWidth="4" fill="none" opacity="0"/>
+            <text className="label-path" x="250" y="425" textAnchor="middle" fontSize="12" fill="#FAF9F5" opacity="0">Verified</text>
           </svg>
         </Illustration>
       </ChapterSection>
@@ -358,6 +326,7 @@ export const AnimatedLanding = () => {
       <ChapterSection
         number={3}
         title="The Impact"
+        label="The Impact"
         isLight={true}
         description={{
           title: 'Breaking barriers.\nEnabling dreams.',
@@ -369,15 +338,35 @@ export const AnimatedLanding = () => {
         }}
       >
         <Illustration>
-          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[550px]">
-            <path
-              className="organic-path"
-              d="M 100 420 Q 150 370 200 320 Q 260 260 320 180 Q 370 110 430 60"
-              fill="none"
-              stroke="#141413"
-              strokeWidth="4"
-              opacity="0.7"
-            />
+          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[500px]">
+            {/* Growth trajectory curve */}
+            <path className="draw-path" d="M 50 420 Q 120 400 160 350 Q 220 280 280 220 Q 340 160 400 100 Q 430 70 460 50"
+                  fill="none" stroke="#141413" strokeWidth="3" opacity="0"/>
+
+            {/* Barrier 1 - Geography */}
+            <path className="draw-path barrier" d="M 140 450 L 140 280" fill="none" stroke="#141413" strokeWidth="2" strokeDasharray="10 5" opacity="0"/>
+            <text className="label-path" x="140" y="470" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">Geography</text>
+
+            {/* Barrier 2 - Bureaucracy */}
+            <path className="draw-path barrier" d="M 260 400 L 260 180" fill="none" stroke="#141413" strokeWidth="2" strokeDasharray="10 5" opacity="0"/>
+            <text className="label-path" x="260" y="420" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">Bureaucracy</text>
+
+            {/* Barrier 3 - Exclusion */}
+            <path className="draw-path barrier" d="M 380 320 L 380 80" fill="none" stroke="#141413" strokeWidth="2" strokeDasharray="10 5" opacity="0"/>
+            <text className="label-path" x="380" y="340" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">Exclusion</text>
+
+            {/* Milestone dots */}
+            <circle className="fill-path" cx="160" cy="350" r="10" fill="#141413" opacity="0"/>
+            <text className="label-path" x="160" y="380" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">1.4B Indians</text>
+
+            <circle className="fill-path" cx="280" cy="220" r="10" fill="#141413" opacity="0"/>
+            <text className="label-path" x="280" y="250" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">32M NRIs</text>
+
+            <circle className="fill-path" cx="400" cy="100" r="10" fill="#141413" opacity="0"/>
+            <text className="label-path" x="400" y="130" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">$52B Market</text>
+
+            <circle className="fill-path" cx="460" cy="50" r="12" fill="#141413" opacity="0"/>
+            <text className="label-path" x="460" y="35" textAnchor="middle" fontSize="10" fill="#141413" opacity="0">Freedom</text>
           </svg>
         </Illustration>
       </ChapterSection>
@@ -386,6 +375,7 @@ export const AnimatedLanding = () => {
       <ChapterSection
         number={4}
         title="The Revolution"
+        label="The Revolution"
         isLight={false}
         description={{
           title: 'An identity\nrenaissance.',
@@ -397,13 +387,44 @@ export const AnimatedLanding = () => {
         }}
       >
         <Illustration>
-          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[550px]">
-            <path
-              className="organic-path"
-              d="M 250 230 Q 210 250 220 300 Q 240 330 290 320 Q 330 300 320 250 Z"
-              fill="#FAF9F5"
-              opacity="0.9"
-            />
+          <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[500px]">
+            {/* Central person - YOU */}
+            <circle className="fill-path" cx="250" cy="250" r="45" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="250" y="255" textAnchor="middle" fontSize="11" fill="#141413" opacity="0">YOU</text>
+
+            {/* Inner circle - self sovereignty */}
+            <circle className="draw-path" cx="250" cy="250" r="65" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+
+            {/* Satellite nodes */}
+            <circle className="fill-path" cx="250" cy="100" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="250" y="80" textAnchor="middle" fontSize="10" fill="#FAF9F5" opacity="0">Bank</text>
+
+            <circle className="fill-path" cx="390" cy="170" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="425" y="175" textAnchor="start" fontSize="10" fill="#FAF9F5" opacity="0">Employer</text>
+
+            <circle className="fill-path" cx="400" cy="300" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="410" y="340" textAnchor="start" fontSize="10" fill="#FAF9F5" opacity="0">Gov</text>
+
+            <circle className="fill-path" cx="310" cy="410" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="310" y="450" textAnchor="middle" fontSize="10" fill="#FAF9F5" opacity="0">Hospital</text>
+
+            <circle className="fill-path" cx="190" cy="410" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="190" y="450" textAnchor="middle" fontSize="10" fill="#FAF9F5" opacity="0">School</text>
+
+            <circle className="fill-path" cx="100" cy="300" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="60" y="305" textAnchor="end" fontSize="10" fill="#FAF9F5" opacity="0">Telco</text>
+
+            <circle className="fill-path" cx="110" cy="170" r="22" fill="#FAF9F5" opacity="0"/>
+            <text className="label-path" x="75" y="175" textAnchor="end" fontSize="10" fill="#FAF9F5" opacity="0">Travel</text>
+
+            {/* Connection lines from YOU to each node */}
+            <path className="draw-path" d="M 250 205 L 250 122" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
+            <path className="draw-path" d="M 285 235 Q 350 200 368 180" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
+            <path className="draw-path" d="M 285 265 Q 350 275 378 295" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
+            <path className="draw-path" d="M 270 285 Q 290 350 305 388" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
+            <path className="draw-path" d="M 230 285 Q 210 350 195 388" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
+            <path className="draw-path" d="M 215 265 Q 150 275 122 295" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
+            <path className="draw-path" d="M 215 235 Q 150 200 132 180" fill="none" stroke="#FAF9F5" strokeWidth="1.5" opacity="0"/>
           </svg>
         </Illustration>
       </ChapterSection>
@@ -412,26 +433,35 @@ export const AnimatedLanding = () => {
       <section className="finale bg-[var(--charcoal)] text-[var(--cream)] min-h-screen flex flex-col items-center justify-center text-center gap-12 p-8 md:p-32">
         <div className="finale-illustration w-80 h-80 md:w-96 md:h-96">
           <svg viewBox="0 0 500 500" fill="none" className="w-full h-full">
-            <path
-              className="organic-path"
-              d="M 180 180 Q 140 200 155 260 Q 180 320 250 330 Q 320 320 345 260 Q 360 200 320 180 Z"
-              fill="#FAF9F5"
-              opacity="0.95"
-            />
-            <path
-              className="organic-path"
-              d="M 250 50 Q 300 120 280 190"
-              fill="none"
-              stroke="#FAF9F5"
-              strokeWidth="2"
-              opacity="0.5"
-            />
+            {/* Person silhouette */}
+            <circle className="fill-path" cx="250" cy="150" r="45" fill="#FAF9F5" opacity="0"/>
+            <path className="fill-path" d="M 200 200 Q 175 235 185 300 Q 210 375 250 385 Q 290 375 315 300 Q 325 235 300 200 Q 275 190 250 190 Q 225 190 200 200"
+                  fill="#FAF9F5" opacity="0"/>
+
+            {/* Key shape - ownership */}
+            <circle className="draw-path" cx="250" cy="320" r="30" fill="none" stroke="#FAF9F5" strokeWidth="5" opacity="0"/>
+            <path className="draw-path" d="M 250 350 L 250 400" fill="none" stroke="#FAF9F5" strokeWidth="5" opacity="0"/>
+            <path className="draw-path" d="M 250 380 L 275 380" fill="none" stroke="#FAF9F5" strokeWidth="5" opacity="0"/>
+            <path className="draw-path" d="M 250 395 L 270 395" fill="none" stroke="#FAF9F5" strokeWidth="5" opacity="0"/>
+
+            {/* Converging rays */}
+            <path className="draw-path" d="M 250 40 Q 255 80 250 105" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 400 60 Q 340 100 300 140" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 450 250 Q 380 255 320 255" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 410 430 Q 350 370 310 330" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 250 460 Q 250 420 250 390" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 90 430 Q 150 370 190 330" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 50 250 Q 120 245 180 255" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+            <path className="draw-path" d="M 100 60 Q 160 100 200 140" fill="none" stroke="#FAF9F5" strokeWidth="2" opacity="0"/>
+
+            {/* Outer ring - unity */}
+            <circle className="draw-path" cx="250" cy="250" r="200" fill="none" stroke="#FAF9F5" strokeWidth="1" opacity="0" strokeDasharray="12 6"/>
           </svg>
         </div>
 
         <div className="max-w-2xl">
-          <p className="landing-label mb-4">Ready for the future?</p>
-          <h2 className="landing-h2 mb-8">
+          <p className="landing-label mb-4 text-[var(--cream)] opacity-50">Ready for the future?</p>
+          <h2 className="landing-h2 mb-8 text-[var(--cream)]">
             Own Your Identity.
             <br />
             Change Everything.

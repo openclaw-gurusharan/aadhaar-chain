@@ -547,20 +547,40 @@
     max-width: 550px;
   }
 
-  /* Organic path - starts invisible, animated to visible */
-  .organic-path {
+  /* GSAP Animation Path Classes - semantic naming */
+  .fill-path {
     opacity: 0;
     transform-origin: center;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .draw-path {
+    opacity: 0;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .label-path {
+    opacity: 0;
+    font-size: 14px;
+    font-weight: 500;
+    text-anchor: middle;
+    pointer-events: none;
   }
 
   /* Hero SVG initial states */
-  .fragmented-identity .organic-path {
+  .fragmented-identity .fill-path {
     opacity: 0;
   }
 
-  .unified-identity .organic-path {
+  .unified-identity .fill-path {
     opacity: 0;
     transform-origin: center;
+  }
+
+  .unified-identity .draw-path {
+    opacity: 0;
   }
 
   /* Chapter number styles */

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page SVG Preview - All Chapters</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --cream: #FAF9F5;
+      --charcoal: #141413;
+    }
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--cream);
+      color: var(--charcoal);
+    }
+    .chapter {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      border-bottom: 1px solid rgba(20,20,19,0.1);
+    }
+    .chapter.dark {
+      background: var(--charcoal);
+      color: var(--cream);
+    }
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 5px;
+      letter-spacing: -0.02em;
+    }
+    .tagline {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-bottom: 30px;
+      text-align: center;
+      max-width: 500px;
+    }
+    .svg-container {
+      width: 100%;
+      max-width: 500px;
+    }
+    svg {
+      width: 100%;
+      height: auto;
+    }
+    .organic-path {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CHAPTER 1: VISION -->
+  <section class="chapter" id="chapter1">
+    <h2>Chapter 1: The Vision</h2>
+    <p class="tagline">"One identity. Infinite possibility."</p>
+    <div class="svg-container">
+      <svg viewBox="0 0 500 500" fill="none">
+        <!-- Person at center - YOU -->
+        <path class="organic-path" d="M250 100 Q230 105 225 130 Q220 155 250 165 Q280 155 275 130 Q270 105 250 100"
+              fill="var(--charcoal)" style="transform: scale(0.8); transform-origin: center"/>
+        <path class="organic-path" d="M210 175 Q190 200 195 260 Q210 320 250 330 Q290 320 305 260 Q310 200 290 175 Q270 165 250 165 Q230 165 210 175"
+              fill="var(--charcoal)" style="transform: scale(0.8); transform-origin: center"/>
+
+        <!-- Radiating lines to possibilities -->
+        <path class="organic-path draw-line" d="M250 80 Q255 50 250 20" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M280 95 Q320 70 360 50" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M295 120 Q340 120 390 120" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M300 155 Q350 175 400 200" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M290 200 Q340 240 380 290" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M270 250 Q300 310 330 370" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M230 250 Q200 310 170 370" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M210 200 Q160 240 120 290" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M200 155 Q150 175 100 200" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M205 120 Q160 120 110 120" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M220 95 Q180 70 140 50" fill="none" stroke="var(--charcoal)" stroke-width="2"/>
+
+        <!-- Possibility labels -->
+        <text class="organic-path label" x="250" y="40" text-anchor="middle" font-size="10" fill="var(--charcoal)">Global</text>
+        <text class="organic-path label" x="385" y="50" text-anchor="middle" font-size="10" fill="var(--charcoal)">Work</text>
+        <text class="organic-path label" x="410" y="120" text-anchor="middle" font-size="10" fill="var(--charcoal)">Travel</text>
+        <text class="organic-path label" x="420" y="205" text-anchor="middle" font-size="10" fill="var(--charcoal)">Bank</text>
+        <text class="organic-path label" x="400" y="300" text-anchor="middle" font-size="10" fill="var(--charcoal)">Services</text>
+        <text class="organic-path label" x="100" y="300" text-anchor="middle" font-size="10" fill="var(--charcoal)">Rights</text>
+        <text class="organic-path label" x="90" y="205" text-anchor="middle" font-size="10" fill="var(--charcoal)">Health</text>
+        <text class="organic-path label" x="110" y="120" text-anchor="middle" font-size="10" fill="var(--charcoal)">Education</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- CHAPTER 2: TECHNOLOGY -->
+  <section class="chapter dark" id="chapter2">
+    <h2>Chapter 2: The Technology</h2>
+    <p class="tagline">"Architecture of trust."</p>
+    <div class="svg-container">
+      <svg viewBox="0 0 600 350" fill="none">
+        <!-- Aadhaar Document -->
+        <path class="organic-path" d="M30 80 L30 180 Q30 190 40 190 L120 190 Q130 190 130 180 L130 100 Q130 90 120 80 Z"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: 80px 135px"/>
+        <path class="organic-path" d="M45 110 L90 110" fill="none" stroke="var(--charcoal)" stroke-width="3"/>
+        <path class="organic-path" d="M45 130 L80 130" fill="none" stroke="var(--charcoal)" stroke-width="3"/>
+        <path class="organic-path" d="M45 150 L70 150" fill="none" stroke="var(--charcoal)" stroke-width="3"/>
+        <text class="organic-path label" x="80" y="220" text-anchor="middle" font-size="12" fill="var(--cream)">Aadhaar</text>
+
+        <!-- Arrow -->
+        <path class="organic-path draw-line" d="M140 135 Q160 135 180 135" fill="none" stroke="var(--cream)" stroke-width="2"/>
+
+        <!-- Lock/Encryption -->
+        <path class="organic-path" d="M190 140 L190 175 Q190 185 200 185 L240 185 Q250 185 250 175 L250 140 Q250 130 240 130 L200 130 Q190 130 190 140 Z"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: 220px 157px"/>
+        <path class="organic-path" d="M205 130 L205 110 Q205 95 220 95 Q235 95 235 110 L235 130"
+              fill="none" stroke="var(--cream)" stroke-width="4"/>
+        <text class="organic-path label" x="220" y="220" text-anchor="middle" font-size="12" fill="var(--cream)">Encrypted</text>
+
+        <!-- Arrow -->
+        <path class="organic-path draw-line" d="M260 155 Q290 155 320 155" fill="none" stroke="var(--cream)" stroke-width="2"/>
+
+        <!-- Blockchain blocks -->
+        <path class="organic-path" d="M330 130 L330 180 Q330 190 340 190 L380 190 Q390 190 390 180 L390 130 Q390 120 380 120 L340 120 Q330 120 330 130 Z"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: 360px 155px"/>
+        <path class="organic-path" d="M390 155 L405 155" fill="none" stroke="var(--cream)" stroke-width="3"/>
+        <path class="organic-path" d="M405 130 L405 180 Q405 190 415 190 L455 190 Q465 190 465 180 L465 130 Q465 120 455 120 L415 120 Q405 120 405 130 Z"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: 435px 155px"/>
+        <path class="organic-path" d="M465 155 L480 155" fill="none" stroke="var(--cream)" stroke-width="3"/>
+        <path class="organic-path" d="M480 130 L480 180 Q480 190 490 190 L530 190 Q540 190 540 180 L540 130 Q540 120 530 120 L490 120 Q480 120 480 130 Z"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: 510px 155px"/>
+        <text class="organic-path label" x="435" y="220" text-anchor="middle" font-size="12" fill="var(--cream)">Solana Blockchain</text>
+
+        <!-- Arrow to credential -->
+        <path class="organic-path draw-line" d="M480 200 Q480 240 440 270" fill="none" stroke="var(--cream)" stroke-width="2"/>
+
+        <!-- Verified badge -->
+        <path class="organic-path" d="M380 270 Q360 265 350 285 Q345 310 380 325 Q415 310 410 285 Q400 265 380 270 Z"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: 380px 295px"/>
+        <path class="organic-path checkmark" d="M365 295 L375 305 L395 280"
+              fill="none" stroke="var(--charcoal)" stroke-width="4"/>
+        <text class="organic-path label" x="380" y="345" text-anchor="middle" font-size="12" fill="var(--cream)">Verified ✓</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- CHAPTER 3: IMPACT -->
+  <section class="chapter" id="chapter3">
+    <h2>Chapter 3: The Impact</h2>
+    <p class="tagline">"Breaking barriers. Enabling dreams."</p>
+    <div class="svg-container">
+      <svg viewBox="0 0 500 500" fill="none">
+        <!-- Growth trajectory - curve going UP -->
+        <path class="organic-path draw-line" d="M50 420 Q120 400 160 350 Q220 280 280 220 Q340 160 400 100 Q430 70 460 50"
+              fill="none" stroke="var(--charcoal)" stroke-width="3"/>
+
+        <!-- Barrier 1 - being crossed -->
+        <path class="organic-path barrier" d="M140 450 L140 280" fill="none" stroke="var(--charcoal)" stroke-width="2" stroke-dasharray="10 5"/>
+        <text class="organic-path label" x="140" y="470" text-anchor="middle" font-size="10" fill="var(--charcoal)">Geography</text>
+
+        <!-- Barrier 2 - being crossed -->
+        <path class="organic-path barrier" d="M260 400 L260 180" fill="none" stroke="var(--charcoal)" stroke-width="2" stroke-dasharray="10 5"/>
+        <text class="organic-path label" x="260" y="420" text-anchor="middle" font-size="10" fill="var(--charcoal)">Bureaucracy</text>
+
+        <!-- Barrier 3 - being crossed -->
+        <path class="organic-path barrier" d="M380 320 L380 80" fill="none" stroke="var(--charcoal)" stroke-width="2" stroke-dasharray="10 5"/>
+        <text class="organic-path label" x="380" y="340" text-anchor="middle" font-size="10" fill="var(--charcoal)">Exclusion</text>
+
+        <!-- Milestone dots along the path -->
+        <circle class="organic-path milestone" cx="160" cy="350" r="8" fill="var(--charcoal)" style="transform: scale(0.5); transform-origin: 160px 350px"/>
+        <text class="organic-path label" x="160" y="380" text-anchor="middle" font-size="10" fill="var(--charcoal)">1.4B Indians</text>
+
+        <circle class="organic-path milestone" cx="280" cy="220" r="8" fill="var(--charcoal)" style="transform: scale(0.5); transform-origin: 280px 220px"/>
+        <text class="organic-path label" x="280" y="250" text-anchor="middle" font-size="10" fill="var(--charcoal)">32M NRIs</text>
+
+        <circle class="organic-path milestone" cx="400" cy="100" r="8" fill="var(--charcoal)" style="transform: scale(0.5); transform-origin: 400px 100px"/>
+        <text class="organic-path label" x="400" y="130" text-anchor="middle" font-size="10" fill="var(--charcoal)">$52B Market</text>
+
+        <circle class="organic-path milestone" cx="460" cy="50" r="10" fill="var(--charcoal)" style="transform: scale(0.5); transform-origin: 460px 50px"/>
+        <text class="organic-path label" x="460" y="35" text-anchor="middle" font-size="10" fill="var(--charcoal)">Freedom</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- CHAPTER 4: REVOLUTION -->
+  <section class="chapter dark" id="chapter4">
+    <h2>Chapter 4: The Revolution</h2>
+    <p class="tagline">"An identity renaissance."</p>
+    <div class="svg-container">
+      <svg viewBox="0 0 500 500" fill="none">
+        <!-- Central person - YOU at the center -->
+        <circle class="organic-path" cx="250" cy="250" r="40" fill="var(--cream)" style="transform: scale(0.5); transform-origin: center"/>
+        <text class="organic-path label" x="250" y="255" text-anchor="middle" font-size="10" fill="var(--charcoal)">YOU</text>
+
+        <!-- Inner circle - your sovereign identity -->
+        <circle class="organic-path" cx="250" cy="250" r="60" fill="none" stroke="var(--cream)" stroke-width="2"/>
+
+        <!-- Satellite nodes - other people/services you connect with -->
+        <circle class="organic-path node" cx="250" cy="100" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 250px 100px"/>
+        <text class="organic-path label" x="250" y="85" text-anchor="middle" font-size="9" fill="var(--cream)">Bank</text>
+
+        <circle class="organic-path node" cx="400" cy="170" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 400px 170px"/>
+        <text class="organic-path label" x="435" y="175" text-anchor="start" font-size="9" fill="var(--cream)">Employer</text>
+
+        <circle class="organic-path node" cx="420" cy="300" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 420px 300px"/>
+        <text class="organic-path label" x="455" y="305" text-anchor="start" font-size="9" fill="var(--cream)">Gov</text>
+
+        <circle class="organic-path node" cx="320" cy="420" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 320px 420px"/>
+        <text class="organic-path label" x="320" y="455" text-anchor="middle" font-size="9" fill="var(--cream)">Hospital</text>
+
+        <circle class="organic-path node" cx="180" cy="420" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 180px 420px"/>
+        <text class="organic-path label" x="180" y="455" text-anchor="middle" font-size="9" fill="var(--cream)">School</text>
+
+        <circle class="organic-path node" cx="80" cy="300" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 80px 300px"/>
+        <text class="organic-path label" x="45" y="305" text-anchor="end" font-size="9" fill="var(--cream)">Telco</text>
+
+        <circle class="organic-path node" cx="100" cy="170" r="20" fill="var(--cream)" style="transform: scale(0.5); transform-origin: 100px 170px"/>
+        <text class="organic-path label" x="65" y="175" text-anchor="end" font-size="9" fill="var(--cream)">Travel</text>
+
+        <!-- Connection lines from YOU to each node -->
+        <path class="organic-path draw-line" d="M250 210 L250 120" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+        <path class="organic-path draw-line" d="M285 235 Q350 200 380 180" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+        <path class="organic-path draw-line" d="M290 265 Q350 280 400 295" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+        <path class="organic-path draw-line" d="M275 285 Q300 350 310 400" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+        <path class="organic-path draw-line" d="M225 285 Q200 350 190 400" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+        <path class="organic-path draw-line" d="M210 265 Q150 280 100 295" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+        <path class="organic-path draw-line" d="M215 235 Q150 200 120 180" fill="none" stroke="var(--cream)" stroke-width="1.5"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- FINALE -->
+  <section class="chapter" id="finale" style="background: var(--charcoal); color: var(--cream);">
+    <h2>Finale</h2>
+    <p class="tagline">"Own Your Identity. Change Everything."</p>
+    <div class="svg-container">
+      <svg viewBox="0 0 500 500" fill="none">
+        <!-- Person silhouette -->
+        <path class="organic-path" d="M250 120 Q225 125 220 155 Q215 185 250 200 Q285 185 280 155 Q275 125 250 120"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: center"/>
+        <path class="organic-path" d="M200 210 Q175 240 180 300 Q200 370 250 380 Q300 370 320 300 Q325 240 300 210 Q275 200 250 200 Q225 200 200 210"
+              fill="var(--cream)" style="transform: scale(0.8); transform-origin: center"/>
+
+        <!-- Key shape integrated - showing OWNERSHIP -->
+        <circle class="organic-path" cx="250" cy="320" r="30" fill="none" stroke="var(--charcoal)" stroke-width="5"/>
+        <path class="organic-path" d="M250 350 L250 400" fill="none" stroke="var(--charcoal)" stroke-width="5"/>
+        <path class="organic-path" d="M250 380 L275 380" fill="none" stroke="var(--charcoal)" stroke-width="5"/>
+        <path class="organic-path" d="M250 395 L270 395" fill="none" stroke="var(--charcoal)" stroke-width="5"/>
+
+        <!-- Converging rays from all directions -->
+        <path class="organic-path draw-line" d="M250 40 Q255 80 250 110" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M400 60 Q340 100 300 140" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M450 250 Q380 255 320 255" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M410 430 Q350 370 310 330" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M250 460 Q250 420 250 390" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M90 430 Q150 370 190 330" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M50 250 Q120 245 180 255" fill="none" stroke="var(--cream)" stroke-width="2"/>
+        <path class="organic-path draw-line" d="M100 60 Q160 100 200 140" fill="none" stroke="var(--cream)" stroke-width="2"/>
+
+        <!-- Outer ring - unity/completeness -->
+        <circle class="organic-path" cx="250" cy="250" r="200" fill="none" stroke="var(--cream)" stroke-width="1" stroke-dasharray="10 5"/>
+      </svg>
+    </div>
+  </section>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Chapter 1: Person appears, then lines draw outward
+    const ch1 = gsap.timeline({
+      scrollTrigger: { trigger: '#chapter1', start: 'top 70%' }
+    });
+    ch1.to('#chapter1 .organic-path:not(.draw-line):not(.label)', {
+      opacity: 0.9, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.5)'
+    });
+    document.querySelectorAll('#chapter1 .draw-line').forEach((line, i) => {
+      const len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      line.style.strokeDashoffset = len;
+      ch1.to(line, { strokeDashoffset: 0, opacity: 0.5, duration: 0.4 }, 0.5 + (i * 0.05));
+    });
+    ch1.to('#chapter1 .label', { opacity: 0.7, duration: 0.3, stagger: 0.05 }, 0.8);
+
+    // Chapter 2: Sequential flow
+    const ch2 = gsap.timeline({
+      scrollTrigger: { trigger: '#chapter2', start: 'top 70%' }
+    });
+    ch2.to('#chapter2 .organic-path:not(.draw-line):not(.label):not(.checkmark)', {
+      opacity: 0.9, scale: 1, duration: 0.4, stagger: 0.05, ease: 'back.out(1.5)'
+    });
+    document.querySelectorAll('#chapter2 .draw-line').forEach((line, i) => {
+      const len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      line.style.strokeDashoffset = len;
+      ch2.to(line, { strokeDashoffset: 0, opacity: 0.7, duration: 0.3 }, i * 0.3);
+    });
+    ch2.to('#chapter2 .label', { opacity: 0.8, duration: 0.3, stagger: 0.1 }, 0.5);
+    ch2.to('#chapter2 .checkmark', { opacity: 1, duration: 0.4 }, 1.5);
+
+    // Chapter 3: Trajectory draws, then milestones appear
+    const ch3 = gsap.timeline({
+      scrollTrigger: { trigger: '#chapter3', start: 'top 70%' }
+    });
+    ch3.to('#chapter3 .barrier', { opacity: 0.3, duration: 0.5 });
+    const mainLine = document.querySelector('#chapter3 .draw-line');
+    const len3 = mainLine.getTotalLength();
+    mainLine.style.strokeDasharray = len3;
+    mainLine.style.strokeDashoffset = len3;
+    ch3.to(mainLine, { strokeDashoffset: 0, opacity: 0.8, duration: 1.5 });
+    ch3.to('#chapter3 .milestone', { opacity: 0.9, scale: 1, duration: 0.4, stagger: 0.2, ease: 'back.out(1.7)' }, 0.8);
+    ch3.to('#chapter3 .label', { opacity: 0.7, duration: 0.3, stagger: 0.1 }, 1.2);
+
+    // Chapter 4: Central node, then connections, then outer nodes
+    const ch4 = gsap.timeline({
+      scrollTrigger: { trigger: '#chapter4', start: 'top 70%' }
+    });
+    ch4.to('#chapter4 circle:first-of-type', { opacity: 0.9, scale: 1, duration: 0.5, ease: 'back.out(2)' });
+    ch4.to('#chapter4 circle:nth-of-type(2)', { opacity: 0.6, duration: 0.4 }, '-=0.2');
+    ch4.to('#chapter4 .draw-line', { opacity: 0.5, duration: 0.5, stagger: 0.05 }, 0.3);
+    ch4.to('#chapter4 .node', { opacity: 0.8, scale: 1, duration: 0.4, stagger: 0.08, ease: 'back.out(1.5)' }, 0.6);
+    ch4.to('#chapter4 .label', { opacity: 0.7, duration: 0.3, stagger: 0.05 }, 0.9);
+
+    // Finale: Person + key, then rays converge inward
+    const fin = gsap.timeline({
+      scrollTrigger: { trigger: '#finale', start: 'top 70%' }
+    });
+    fin.to('#finale .organic-path:not(.draw-line):not(.label)', {
+      opacity: 0.9, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.5)'
+    });
+    document.querySelectorAll('#finale .draw-line').forEach((line, i) => {
+      const len = line.getTotalLength();
+      line.style.strokeDasharray = len;
+      line.style.strokeDashoffset = len;
+      fin.to(line, { strokeDashoffset: 0, opacity: 0.5, duration: 0.4 }, 0.5 + (i * 0.06));
+    });
+    fin.to('#finale circle:last-of-type', { opacity: 0.3, duration: 0.8 }, 1);
+  </script>
+</body>
+</html>
