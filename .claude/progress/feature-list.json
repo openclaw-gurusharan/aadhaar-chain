@@ -1,8 +1,8 @@
 {
-  "version": "1.2.0",
-  "project": "identity-agent-platform",
+  "version": "2.1.0",
+  "project": "identity-asset-tokenization-platform",
   "created": "2026-01-01",
-  "updated": "2026-01-02T12:00:00Z",
+  "updated": "2026-01-02T20:00:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -32,33 +32,33 @@
     },
     {
       "id": "feat-003",
-      "description": "Identity creation page with document upload",
+      "description": "Identity creation page with API Setu credential selection",
       "priority": "P0",
       "status": "completed",
       "phase": 2,
       "acceptance_criteria": [
-        "Document upload form",
-        "Aadhaar/PAN selection",
-        "Client-side preview",
-        "Submit for verification button"
+        "Credential selection form (Aadhaar, PAN, DL, Land Records, Education)",
+        "API Setu authorization button",
+        "Credential preview after fetch",
+        "Submit for tokenization button"
       ]
     },
     {
       "id": "feat-004",
-      "description": "Identity dashboard showing DID and verification status",
+      "description": "Identity dashboard showing DID and credential tokens",
       "priority": "P0",
       "status": "completed",
       "phase": 2,
       "acceptance_criteria": [
         "Display DID",
-        "Verification bitmap visualization",
+        "Credential tokens list",
         "Last updated timestamp",
-        "Credential count"
+        "Access grant management UI"
       ]
     },
     {
       "id": "feat-005",
-      "description": "Verification flow page with progress tracking",
+      "description": "Tokenization flow page with progress tracking",
       "priority": "P1",
       "status": "completed",
       "phase": 3,
@@ -154,7 +154,7 @@
     },
     {
       "id": "feat-006",
-      "description": "FastAPI gateway scaffold with config and health endpoint",
+      "description": "FastAPI gateway scaffold with Claude Agent SDK foundation",
       "priority": "P0",
       "status": "pending",
       "phase": 5,
@@ -163,193 +163,218 @@
         "requirements.txt with fastapi, uvicorn, claude-agent-sdk, solders",
         "config.py with environment variable loading",
         "main.py with CORS, health endpoint",
-        ".env.example with required variables"
+        ".env.example with required variables (APISETU_CLIENT_ID, SOLANA_RPC_URL, ANTHROPIC_API_KEY)"
       ]
     },
     {
       "id": "feat-007",
-      "description": "Pydantic models for identity, verification, and credentials",
+      "description": "Pydantic models for identity, credentials, and tokenization",
       "priority": "P0",
       "status": "pending",
       "phase": 5,
       "acceptance_criteria": [
         "Identity model matching frontend types",
-        "AadhaarVerificationData and PanVerificationData models",
-        "VerificationStatus with steps and progress",
-        "Credential model with claims",
+        "CredentialData model for Aadhaar, PAN, DL, Land Records, Education",
+        "CredentialToken model with claims and metadata",
+        "AccessGrant model (selective disclosure, time-bound)",
         "ApiResponse wrapper for consistent responses"
       ]
     },
     {
       "id": "feat-008",
-      "description": "Document Processor MCP tools with Tesseract OCR",
+      "description": "API Setu integration service for credential fetching",
       "priority": "P0",
       "status": "pending",
       "phase": 5,
       "acceptance_criteria": [
-        "@tool decorated ocr function",
-        "@tool decorated extract_fields function",
-        "Tesseract integration via pytesseract",
-        "Aadhaar field extraction (name, DOB, UID)",
-        "PAN field extraction (name, PAN number, DOB)",
-        "create_sdk_mcp_server for document-processor"
+        "API Setu client with authentication",
+        "Fetch Aadhaar details endpoint",
+        "Fetch PAN details endpoint",
+        "Fetch Driving License endpoint",
+        "Fetch Land Records endpoint",
+        "Fetch Education records endpoint",
+        "Error handling for API failures",
+        "Response caching with TTL"
+      ]
+    },
+    {
+      "id": "feat-008a",
+      "description": "Identity routes (create, fetch, update DID on Solana)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "GET /api/identity/{walletAddress} - fetch identity from Solana",
+        "POST /api/identity/{walletAddress} - create new DID (returns unsigned tx)",
+        "PATCH /api/identity/{walletAddress} - update commitment/key rotation (returns unsigned tx)",
+        "Query Solana account for identity data",
+        "Return unsigned transaction for frontend wallet signing"
       ]
     },
     {
       "id": "feat-009",
-      "description": "Pattern Analyzer and Compliance Rules MCP tools",
-      "priority": "P1",
+      "description": "Credential routes (fetch, tokenize, list)",
+      "priority": "P0",
       "status": "pending",
       "phase": 5,
       "acceptance_criteria": [
-        "detect_tampering tool (image hash, metadata checks)",
-        "check_watchlist tool (mock implementation)",
-        "check_aadhaar_act tool (consent, purpose validation)",
-        "check_dpdp tool (data minimization rules)",
-        "MCP servers for pattern-analyzer and compliance-rules"
+        "GET /api/credentials/{walletAddress} - list all credential tokens",
+        "POST /api/credentials/{walletAddress} - fetch from API Setu and tokenize",
+        "GET /api/credentials/{walletAddress}/{credentialType} - get specific credential",
+        "DELETE /api/credentials/{walletAddress}/{credentialId} - revoke credential",
+        "In-memory credential store (temporary, migrate to Solana)"
+      ]
+    },
+    {
+      "id": "feat-009a",
+      "description": "Transaction routes (prepare unsigned tx, submit signed tx)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 5,
+      "acceptance_criteria": [
+        "POST /api/transaction/prepare - build unsigned transaction from instruction",
+        "POST /api/transaction/submit - submit wallet-signed transaction to Solana",
+        "Get recent blockhash for transaction validity",
+        "Return base64-encoded transaction for frontend",
+        "Return transaction signature after submission"
       ]
     },
     {
       "id": "feat-010",
-      "description": "Agent definitions for Document Validator, Fraud Detection, Compliance",
+      "description": "Access grant routes (selective disclosure, time-bound)",
       "priority": "P0",
       "status": "pending",
       "phase": 5,
       "acceptance_criteria": [
-        "AgentDefinition for document-validator with MCP tools",
-        "AgentDefinition for fraud-detection with pattern tools",
-        "AgentDefinition for compliance-monitor with compliance tools",
-        "Clear descriptions for auto-delegation",
-        "Tool restrictions per agent (no Task in subagents)"
+        "POST /api/grant/{walletAddress} - grant access to service",
+        "GET /api/grants/{walletAddress} - list active grants",
+        "DELETE /api/grants/{walletAddress}/{grantId} - revoke access",
+        "Time-bound access auto-expiry",
+        "Selective disclosure field filtering"
       ]
     },
     {
       "id": "feat-011",
-      "description": "Orchestrator agent with verification workflow",
-      "priority": "P0",
+      "description": "Verification status routes (progress tracking)",
+      "priority": "P1",
       "status": "pending",
       "phase": 5,
       "acceptance_criteria": [
-        "ClaudeAgentOptions with Task tool enabled",
-        "Subagent coordination flow",
-        "verify_aadhaar workflow (parse → fraud → compliance)",
-        "verify_pan workflow",
-        "Result aggregation and decision logic"
+        "GET /api/verification/{walletAddress}/status - overall status",
+        "GET /api/verification/{verificationId} - specific verification status",
+        "WebSocket support for real-time updates (optional)",
+        "Progress percentage and current step"
       ]
     },
     {
       "id": "feat-012",
-      "description": "Verification routes with status tracking",
+      "description": "Solana service layer with solders library",
       "priority": "P0",
-      "status": "pending",
-      "phase": 5,
-      "acceptance_criteria": [
-        "POST /{walletAddress}/aadhaar endpoint",
-        "POST /{walletAddress}/pan endpoint",
-        "GET /status/{verificationId} endpoint",
-        "In-memory verification status store",
-        "Progress updates during agent workflow"
-      ]
-    },
-    {
-      "id": "feat-013",
-      "description": "Identity and Transaction routes",
-      "priority": "P1",
-      "status": "pending",
-      "phase": 5,
-      "acceptance_criteria": [
-        "GET /api/identity/{walletAddress}",
-        "POST /api/identity/{walletAddress} (mock tx preparation)",
-        "PATCH /api/identity/{walletAddress}",
-        "POST /api/transaction/prepare",
-        "POST /api/transaction/submit"
-      ]
-    },
-    {
-      "id": "feat-014",
-      "description": "Credentials routes for issuance and revocation",
-      "priority": "P1",
-      "status": "pending",
-      "phase": 5,
-      "acceptance_criteria": [
-        "GET /api/credentials/{walletAddress}",
-        "POST /api/credentials/{walletAddress}",
-        "DELETE /api/credentials/{walletAddress}/{credentialId}",
-        "In-memory credential store (mock)",
-        "Credential claims structure"
-      ]
-    },
-    {
-      "id": "feat-015",
-      "description": "Solana service layer with solders/anchorpy",
-      "priority": "P1",
       "status": "pending",
       "phase": 6,
       "acceptance_criteria": [
-        "RPC client initialization",
-        "Transaction preparation (unsigned for frontend)",
-        "Transaction submission",
+        "RPC client initialization (devnet/mainnet)",
+        "Keypair management from wallet signature",
+        "Transaction preparation (unsigned for frontend signing)",
+        "Transaction submission helper",
         "PDA derivation for identity accounts",
         "Balance and account info queries"
       ]
     },
     {
-      "id": "feat-016",
+      "id": "feat-013",
       "description": "Identity Core Solana program with DID registry",
       "priority": "P0",
       "status": "pending",
       "phase": 7,
       "acceptance_criteria": [
-        "create_identity instruction",
-        "update_commitment instruction",
-        "set_verification_bit instruction",
-        "recover_identity instruction"
+        "create_identity instruction (initialize DID)",
+        "update_commitment instruction (rotate keys)",
+        "set_verification_bit instruction (mark credential as verified)",
+        "recover_identity instruction (social recovery)",
+        "Identity account structure",
+        "PDAs for identity accounts"
       ]
     },
     {
-      "id": "feat-017",
+      "id": "feat-014",
       "description": "Credential Vault Solana program for verifiable credentials",
-      "priority": "P1",
+      "priority": "P0",
       "status": "pending",
       "phase": 7,
       "acceptance_criteria": [
-        "issue_credential instruction",
-        "revoke_credential instruction",
-        "verify_zk_proof instruction",
+        "issue_credential instruction (store credential on-chain)",
+        "revoke_credential instruction (mark as revoked)",
+        "grant_access instruction (time-bound access grant)",
+        "revoke_access instruction (cancel access grant)",
+        "verify_credential instruction (check validity)",
         "PDA-based credential storage"
       ]
     },
     {
-      "id": "feat-018",
-      "description": "End-to-end integration and testing",
+      "id": "feat-015",
+      "description": "Frontend to backend integration",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 8,
+      "acceptance_criteria": [
+        "Connect frontend API client to FastAPI routes",
+        "Wallet signature for authentication",
+        "Error handling and retry logic",
+        "Loading states for async operations",
+        "Success/error notifications"
+      ]
+    },
+    {
+      "id": "feat-016",
+      "description": "Frontend to Solana integration (transaction signing)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 8,
+      "acceptance_criteria": [
+        "Transaction signing with wallet adapter",
+        "Transaction confirmation handling",
+        "Error handling for failed transactions",
+        "Balance updates after transactions",
+        "Network switch (devnet/mainnet)"
+      ]
+    },
+    {
+      "id": "feat-017",
+      "description": "End-to-end testing and bug fixes",
       "priority": "P1",
       "status": "pending",
       "phase": 8,
       "acceptance_criteria": [
-        "Frontend to backend API integration",
-        "Backend to Solana program integration",
-        "Full verification flow test",
-        "Error handling across layers"
+        "Full credential fetch flow test",
+        "Tokenization to Solana test",
+        "Access grant and revocation test",
+        "Error handling across all layers",
+        "Browser testing for user flows"
       ]
     }
   ],
   "summary": {
-    "total": 22,
+    "total": 19,
     "by_priority": {
-      "P0": 12,
-      "P1": 10
+      "P0": 15,
+      "P1": 4
     },
     "by_status": {
-      "pending": 11,
+      "pending": 14,
       "in_progress": 0,
-      "completed": 11
+      "completed": 5
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
-      "5": "Backend + Agent SDK",
+      "5": "Backend (FastAPI + API Setu + Routes)",
       "6": "Solana Service Layer",
       "7": "Solana Programs",
-      "8": "Integration"
+      "8": "Integration & Testing"
     }
+  },
+  "notes": {
+    "ai_features": "Deferred - AI agents (fraud detection, privacy enforcement, behavioral monitoring) will be added in Phase 2 after core infrastructure is complete",
+    "architecture": "Backend built on Claude Agent SDK framework for future AI integration, but Phase 1 focuses on: API Setu → Solana tokenization → selective disclosure"
   }
 }
