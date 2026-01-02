@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
 import {
   useProgressBar,
   useHeroAnimations,
@@ -13,6 +15,8 @@ import {
   initializeStrokePaths,
 } from './useGsapAnimations';
 import { Navbar } from './Navbar';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const HeroSection = () => (
   <section className="hero min-h-screen flex flex-col items-center justify-center relative p-4 overflow-hidden bg-[var(--cream)]">
@@ -120,7 +124,7 @@ interface ChapterSectionProps {
 }
 
 const ChapterSection = ({ number, title, description, isLight, children }: ChapterSectionProps) => (
-  <section className={`chapter min-h-screen flex items-center justify-center relative p-6 md:p-12 ${isLight ? 'bg-[var(--cream)] text-[var(--charcoal)]' : 'bg-[var(--charcoal)] text-[var(--cream)]'}`}>
+  <section className={`chapter ${isLight ? 'light' : 'dark'} min-h-screen flex items-center justify-center relative p-6 md:p-12 ${isLight ? 'bg-[var(--cream)] text-[var(--charcoal)]' : 'bg-[var(--charcoal)] text-[var(--cream)]'}`}>
     <span className={`chapter-number absolute top-0 left-0 text-8xl md:text-9xl font-serif opacity-[0.04] font-normal`}>
       {number}
     </span>
@@ -177,7 +181,20 @@ export const AnimatedLanding = () => {
   useNavbarHideOnScroll();
 
   useEffect(() => {
+    // Reset scroll position when component mounts (especially after wallet disconnect)
+    window.scrollTo(0, 0);
+
+    // Initialize stroke paths for SVG animations
     initializeStrokePaths();
+
+    // Refresh ScrollTrigger to recalculate positions after mount
+    ScrollTrigger.refresh();
+
+    return () => {
+      // Cleanup on unmount - kill all animations and ScrollTriggers
+      gsap.killTweensOf('*');
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
   }, []);
 
   // Don't render landing page if wallet is connected
@@ -219,19 +236,85 @@ export const AnimatedLanding = () => {
       >
         <Illustration>
           <svg viewBox="0 0 500 500" fill="none" className="w-full h-full max-w-[550px]">
+            {/* Central core */}
             <path
               className="organic-path"
               d="M 200 200 Q 160 220 170 270 Q 185 310 250 320 Q 315 310 330 270 Q 340 220 300 200 Z"
               fill="#141413"
-              opacity="0.9"
+              opacity="0"
+              style={{ transform: 'scale(0.8)', transformOrigin: 'center' }}
             />
+            {/* Radiating line - top */}
             <path
               className="organic-path"
-              d="M 250 150 Q 270 190 250 250"
+              d="M 250 200 Q 260 140 250 80"
               fill="none"
               stroke="#141413"
               strokeWidth="2"
-              opacity="0.4"
+              opacity="0"
+            />
+            {/* Radiating line - top right */}
+            <path
+              className="organic-path"
+              d="M 290 210 Q 340 160 390 120"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
+            />
+            {/* Radiating line - right */}
+            <path
+              className="organic-path"
+              d="M 330 260 Q 380 255 430 250"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
+            />
+            {/* Radiating line - bottom right */}
+            <path
+              className="organic-path"
+              d="M 300 310 Q 350 360 400 400"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
+            />
+            {/* Radiating line - bottom */}
+            <path
+              className="organic-path"
+              d="M 250 320 Q 245 380 250 440"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
+            />
+            {/* Radiating line - bottom left */}
+            <path
+              className="organic-path"
+              d="M 200 310 Q 150 360 100 400"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
+            />
+            {/* Radiating line - left */}
+            <path
+              className="organic-path"
+              d="M 170 260 Q 120 255 70 250"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
+            />
+            {/* Radiating line - top left */}
+            <path
+              className="organic-path"
+              d="M 210 210 Q 160 160 110 120"
+              fill="none"
+              stroke="#141413"
+              strokeWidth="2"
+              opacity="0"
             />
           </svg>
         </Illustration>

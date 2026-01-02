@@ -531,4 +531,53 @@
   .animate-bounce-scroll {
     animation: bounce 2s infinite;
   }
+
+  /* SVG Illustration styles */
+  .illustration {
+    position: relative;
+    height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .illustration svg {
+    width: 100%;
+    height: 100%;
+    max-width: 550px;
+  }
+
+  /* Organic path - starts invisible, animated to visible */
+  .organic-path {
+    opacity: 0;
+    transform-origin: center;
+  }
+
+  /* Hero SVG initial states */
+  .fragmented-identity .organic-path {
+    opacity: 0;
+  }
+
+  .unified-identity .organic-path {
+    opacity: 0;
+    transform-origin: center;
+  }
+
+  /* Chapter number styles */
+  .light .chapter-number {
+    color: var(--charcoal);
+    opacity: 0.04;
+  }
+
+  .dark .chapter-number {
+    color: var(--cream);
+    opacity: 0.04;
+  }
+
+  /* Responsive illustrations */
+  @media (max-width: 968px) {
+    .illustration {
+      height: 350px;
+    }
+  }
 }
