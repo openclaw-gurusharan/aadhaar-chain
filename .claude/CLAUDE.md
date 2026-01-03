@@ -9,12 +9,35 @@ Identity Agent Platform - Solana + Claude Agent SDK
 | Task | Command |
 |------|---------|
 | Check state | `~/.claude/skills/orchestrator/scripts/check-state.sh` |
+| Restart servers | `.claude/scripts/restart-servers.sh` |
 | Run tests | `npm test` |
 | Health check | `curl -s http://localhost:3000/api/health` |
 | Dev server | `cd frontend && npm run dev` |
 | Build programs | `anchor build` |
 | Deploy devnet | `anchor deploy --provider.cluster devnet` |
 | Start gateway | `cd gateway && uvicorn app.main:app --reload` |
+
+## Deterministic Workflows (`.claude/scripts/`)
+
+**Project-specific scripts for repeatable automation.**
+
+| Script | Purpose | Exit Codes |
+|--------|---------|------------|
+| `restart-servers.sh` | Kill + restart frontend (3000) + gateway (8000) | 0=healthy, 1=failed, 2=timeout |
+
+**Convention:**
+
+- Skills check `.claude/scripts/` first before global scripts
+- Exit codes: 0=pass, 1=fail, 2=timeout/needs-fix
+- Store evidence in `/tmp/` for verification
+- After fixing issues, ask: "What should be automated into a script?"
+
+**Automation Trigger:**
+After completing any manual workflow (restart servers, test flow, debug session), ask:
+
+- "What part of this workflow can be automated into `.claude/scripts/`?"
+- Create/update script with deterministic exit codes
+- Reference in CLAUDE.md for future agents
 
 ## State → Skill
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models.credentials import CredentialResponse, CredentialData, UnsignedTransaction
+from models.credentials import CredentialResponse, CredentialData
 from models.common import ApiResponse
 from services.apisetu import apisetu_client
 

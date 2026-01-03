@@ -1,7 +1,12 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False
+    )
+
     # API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
@@ -21,14 +26,10 @@ class Settings(BaseSettings):
     # API Setu
     apisetu_client_id: str
     apisetu_client_secret: str
-    apisetu_env: str = "sandbox"  # sandbox or production
+    apisetu_env: str = "sandbox"
 
     # IPFS
     ipfs_gateway_url: str = "https://ipfs.io/ipfs"
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
 
 
 settings = Settings()

@@ -2,13 +2,15 @@ import base64
 from typing import Optional
 from solana.rpc.async_api import AsyncClient
 from solana.rpc.commitment import Confirmed
-from solana.publickey import PublicKey
 from solders.transaction import VersionedTransaction
 from solders.message import MessageV0
 from solders.hash import Hash as SolderHash
 from solders.pubkey import Pubkey
 from solders.instruction import Instruction
 from config import settings
+
+# Type alias for compatibility
+PublicKey = Pubkey
 
 
 class SolanaService:
