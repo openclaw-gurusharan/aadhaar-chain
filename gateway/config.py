@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     api_port: int = 8000
     api_prefix: str = "/api"
 
+    # Database
+    database_url: str = "postgresql+asyncpg://user:password@localhost:5432/identity_db"
+
     # CORS
     cors_origins: list[str] = ["http://localhost:3000"]
 

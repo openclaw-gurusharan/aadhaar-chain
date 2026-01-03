@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
+from database import init_db, close_db
 from routes import identity, credentials, verification, transaction, grants
 
 
@@ -12,9 +13,22 @@ async def lifespan(app: FastAPI):
     print(f"Starting Identity & Asset Tokenization Gateway")
     print(f"Solana RPC: {settings.solana_rpc_url}")
     print(f"API Setu Environment: {settings.apisetu_env}")
+    print(f"Database URL: {settings.database_url}")
+
+    # Initialize database
+    try:
+        await init_db()
+        print("Database initialized successfully")
+    except Exception as e:
+        print(f"Database initialization failed: {e}")
+        raise
+
     yield
+
     # Shutdown
     print("Shutting down gateway")
+    await close_db()
+    print("Database connection closed")
 
 
 app = FastAPI(
