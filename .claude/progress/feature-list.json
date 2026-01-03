@@ -494,5 +494,9 @@
   "notes": {
     "ai_features": "Deferred - AI agents (fraud detection, privacy enforcement, behavioral monitoring) will be added in Phase 2 after core infrastructure is complete",
     "architecture": "Backend built on Claude Agent SDK framework for future AI integration, but Phase 1 focuses on: API Setu → Solana tokenization → selective disclosure"
+  },
+  "metadata": {
+    "total": 32,
+    "completed": 0
   }
 }
