@@ -126,7 +126,7 @@
     },
     {
       "id": "feat-005e",
-      "description": "Bidirectional wallet-based routing (connect\u2192dashboard, disconnect\u2192landing)",
+      "description": "Bidirectional wallet-based routing (connect→dashboard, disconnect→landing)",
       "priority": "P0",
       "status": "completed",
       "phase": 4,
@@ -322,9 +322,9 @@
       "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 3: PDA Derivation Logic",
       "acceptance_criteria": [
         "Create gateway/services/pda.py with PDAService class",
-        "Implement derive_identity_pda(wallet_address) \u2192 (pda_address, bump)",
-        "Implement derive_credential_pda(wallet, credential_type, issuer_did) \u2192 (pda_address, bump)",
-        "Implement derive_grant_pda(credential_pda, grantor, purpose) \u2192 (pda_address, bump)",
+        "Implement derive_identity_pda(wallet_address) → (pda_address, bump)",
+        "Implement derive_credential_pda(wallet, credential_type, issuer_did) → (pda_address, bump)",
+        "Implement derive_grant_pda(credential_pda, grantor, purpose) → (pda_address, bump)",
         "Use solders library for deterministic derivation matching Solana",
         "PDA derivation logic tested and verified"
       ]
@@ -365,7 +365,7 @@
       "id": "feat-012f",
       "description": "Phase 6: Database migration and end-to-end testing",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 6,
       "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 6: Migration and Testing",
       "acceptance_criteria": [
@@ -373,7 +373,7 @@
         "Create initial migration via alembic: alembic revision --autogenerate",
         "Run migration: alembic upgrade head",
         "Verify schema matches Solana account structures",
-        "End-to-end test: Form submission \u2192 Backend \u2192 PDA derivation \u2192 DB storage \u2192 Response",
+        "End-to-end test: Form submission → Backend → PDA derivation → DB storage → Response",
         "Test verification bits, field masks, expiry logic",
         "No sensitive data in database verified"
       ]
@@ -472,6 +472,6 @@
   },
   "notes": {
     "ai_features": "Deferred - AI agents (fraud detection, privacy enforcement, behavioral monitoring) will be added in Phase 2 after core infrastructure is complete",
-    "architecture": "Backend built on Claude Agent SDK framework for future AI integration, but Phase 1 focuses on: API Setu \u2192 Solana tokenization \u2192 selective disclosure"
+    "architecture": "Backend built on Claude Agent SDK framework for future AI integration, but Phase 1 focuses on: API Setu → Solana tokenization → selective disclosure"
   }
 }

@@ -35,7 +35,7 @@ fi
 cat << EOF
 <system-reminder>
 SESSION START PROTOCOL:
-1. Load orchestrator skill: /orchestrator
+1. Proactively load orchestrator skill: /orchestrator to ensure it is loaded for the session.
 2. Current state: $CURRENT_STATE
 3. Run check-state.sh if needed
 4. Load appropriate skill for state (init/implement/test/complete)
