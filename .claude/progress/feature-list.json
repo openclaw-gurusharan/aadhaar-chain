@@ -458,9 +458,9 @@
       "P1": 4
     },
     "by_status": {
-      "pending": 2,
-      "in_progress": 1,
-      "completed": 18
+      "pending": 5,
+      "in_progress": 2,
+      "completed": 24
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
