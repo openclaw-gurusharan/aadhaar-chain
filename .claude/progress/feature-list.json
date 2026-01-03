@@ -333,7 +333,7 @@
       "id": "feat-012d",
       "description": "Phase 4: Create repository layer (CRUD operations for all entities)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 6,
       "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 4: Database Operations Layer",
       "acceptance_criteria": [
@@ -349,7 +349,7 @@
       "id": "feat-012e",
       "description": "Phase 5: Replace in-memory stores with database operations in route handlers",
       "priority": "P0",
-      "status": "pending",
+      "status": "in_progress",
       "phase": 6,
       "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 5: Update Route Handlers",
       "acceptance_criteria": [
@@ -458,9 +458,9 @@
       "P1": 4
     },
     "by_status": {
-      "pending": 3,
+      "pending": 2,
       "in_progress": 1,
-      "completed": 17
+      "completed": 18
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
