@@ -30,6 +30,28 @@ Examples: ❌ update-feature (already efficient) | ✅ restart-servers (operatio
 - Store evidence in `/tmp/`
 - Update `.claude/scripts/README.md`
 
+## Skill Improvement Check
+
+Evaluate: Does any skill need updates?
+
+**Update skill if:**
+
+- Missing generic workflow step (applies to all projects)
+- Token inefficiency in instructions
+- MCP tool usage pattern that's universally useful
+- Missing best practice
+
+**DO NOT update with:**
+
+- Project-specific URLs, ports, configs
+- Project-specific script names
+
+**If update needed:**
+
+1. Document the improvement
+2. Ask user: "Skill update needed: [description]. Apply?"
+3. If approved: Use `skill-creator`
+
 ## If Not Worth Automating
 
 Log to context graph:
