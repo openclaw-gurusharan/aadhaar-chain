@@ -10,10 +10,39 @@ Analyze the completed workflow and identify repeatable patterns that should be c
    - Manual and error-prone
    - High token cost (could be scripted)
    - Required for future sessions
-3. **Evaluate value**: Is the automation worth scripting?
-4. **Create or log**:
+3. **Assess token efficiency of current process** (see below)
+4. **Evaluate value**: Is the automation worth scripting?
+5. **Create or log**:
    - **If YES**: Create script in `.claude/scripts/`, update README.md
    - **If NO**: Log to context graph as "not worth automating yet"
+
+## Token Efficiency Assessment
+
+Before creating a script, analyze the **current process cost**:
+
+| Current Process | Context Cost | Script Value |
+|---|---|---|
+| Already uses `token-efficient` MCP (execute_code, process_csv, etc.) | ~0 tokens | ❌ No token savings |
+| Loads raw data/files into context | 200-500+ tokens | ✅ High - script can eliminate loading |
+| Multi-step manual bash operations | 100-300 tokens | ✅ Medium-High - consolidates into one operation |
+| Manual Python with data in context | 150-400+ tokens | ✅ High - wrap in script to avoid context loading |
+
+**Decision Framework:**
+
+Script is worth creating if:
+
+- **Token savings:** `(Tokens saved per use × expected total uses) - (script creation overhead ~200) > 0`
+  - AND current process is expensive (not already using token-efficient MCP)
+- **Operational value:** Process used >3 times per session OR prevents critical errors
+  - Even if token savings are marginal, operational benefit justifies it
+
+**Examples:**
+
+| Workflow | Current Cost | Script Benefit | Decision |
+|---|---|---|---|
+| Update feature list (using token-efficient MCP) | ~0 tokens | Adds bash wrapper, no token savings | ❌ Skip - already efficient |
+| Restart servers (kill + start 2 services) | 30-60s manual + error prone | Consolidates steps, health checks | ✅ Keep - operational value |
+| Load CSV, grep logs, process output | 200+ tokens in context | Can run entirely in sandbox | ✅ Create - high token savings |
 
 ## Script Convention
 
