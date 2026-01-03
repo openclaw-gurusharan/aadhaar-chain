@@ -2,6 +2,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import declarative_base
 from config import settings
 
+# Base class for all models (must be defined before importing models)
+Base = declarative_base()
+
 # Create async engine
 engine = create_async_engine(
     settings.database_url,
@@ -17,9 +20,6 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
-
-# Base class for all models
-Base = declarative_base()
 
 
 async def get_db():
@@ -37,3 +37,7 @@ async def init_db():
 async def close_db():
     """Close database connection pool"""
     await engine.dispose()
+
+
+# Import database models after Base is defined (registering them with metadata)
+from db_models import Identity, Credential, AccessGrant, Verification  # noqa: E402, F401
