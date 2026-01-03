@@ -1,7 +1,7 @@
 {
   "state": "IMPLEMENT",
   "entered_at": "2026-01-01T184500+05:30",
-  "health_status": "UNKNOWN",
+  "health_status": "OFFLINE",
   "history": [
     {
       "from": "START",
@@ -15,5 +15,6 @@
       "at": "2026-01-01T184500+05:30",
       "reason": "feat-001 start"
     }
-  ]
+  ],
+  "last_updated": "2026-01-03T11:55:50Z"
 }

@@ -1,10 +1,8 @@
 {
-  "last_updated": "2026-01-02T21:03:42Z",
-  "current_feature": "feat-015",
-  "feature_status": "completed",
-  "next_feature": "feat-013/014",
-  "next_action": "Implement Solana Anchor programs (identity-core, credential-vault)",
-  "completed_features": 15,
+  "session_summary": "Auto-checkpoint: 25/32 features complete. State: IMPLEMENT. Health: OFFLINE. Current: feat-013",
+  "last_updated": "2026-01-03T11:55:50Z",
+  "current_feature": "feat-013",
+  "completed_features": 25,
   "pending_features": 4,
-  "total_features": 19
+  "total_features": 32
 }
