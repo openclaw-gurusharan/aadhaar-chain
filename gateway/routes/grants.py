@@ -1,81 +1,106 @@
-from fastapi import APIRouter, HTTPException
+from datetime import datetime, timedelta
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from models.credentials import AccessGrant
 from models.common import ApiResponse
-from datetime import datetime
+from database import get_db
+from repositories.grant_repo import GrantRepository
+from services.pda import PDAService
 import secrets
+import uuid
 
 router = APIRouter(prefix="/grants", tags=["Access Grants"])
 
 
-_grants_store: dict[str, list[dict]] = {}
-
-
-@router.post("/{wallet_address}", response_model=ApiResponse[AccessGrant])
-async def create_access_grant(wallet_address: str, request: dict):
+@router.post("/{wallet_address}", response_model=ApiResponse[dict])
+async def create_access_grant(wallet_address: str, request: dict, db: AsyncSession = Depends(get_db)):
     try:
-        credential_id = request.get("credential_id")
+        credential_pda = request.get("credential_pda")
         granted_to = request.get("granted_to")
-        fields = request.get("fields", [])
         purpose = request.get("purpose", "")
         duration_hours = request.get("duration_hours", 24)
+        field_mask = request.get("field_mask", 0)
 
-        if not credential_id or not granted_to:
+        if not credential_pda or not granted_to:
             raise HTTPException(
-                status_code=400, detail="credential_id and granted_to are required"
+                status_code=400, detail="credential_pda and granted_to are required"
             )
 
+        # Generate grant_id and derive PDA
         grant_id = secrets.token_hex(8)
-        expires_at = int(datetime.now().timestamp()) + (duration_hours * 3600)
-        created_at = int(datetime.now().timestamp())
+        pda_service = PDAService()
+        grant_pda, bump = pda_service.derive_grant_pda(
+            credential_pda, wallet_address, purpose
+        )
 
-        grant = {
-            "grant_id": grant_id,
-            "credential_id": credential_id,
-            "granted_to": granted_to,
-            "fields": fields,
-            "purpose": purpose,
-            "expires_at": expires_at,
-            "created_at": created_at,
-            "revoked_at": None,
-        }
+        # Calculate expiry
+        expires_at = datetime.utcnow() + timedelta(hours=duration_hours)
 
-        if wallet_address not in _grants_store:
-            _grants_store[wallet_address] = []
-        _grants_store[wallet_address].append(grant)
+        # Create grant in database
+        repo = GrantRepository(db)
+        grant = await repo.create(
+            grant_id=grant_id,
+            pda_address=grant_pda,
+            credential_pda=credential_pda,
+            grantor_wallet=wallet_address,
+            grantee_wallet=granted_to,
+            expires_at=expires_at,
+            bump=bump,
+            purpose=purpose,
+            field_mask=field_mask,
+        )
+        await db.commit()
 
-        return ApiResponse(success=True, data=AccessGrant(**grant))
+        return ApiResponse(
+            success=True,
+            data={
+                "grant_id": grant.grant_id,
+                "pda_address": grant.pda_address,
+                "expires_at": grant.expires_at.isoformat(),
+            },
+        )
     except Exception as e:
+        await db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{wallet_address}", response_model=ApiResponse[list[AccessGrant]])
-async def list_grants(wallet_address: str):
+@router.get("/{wallet_address}", response_model=ApiResponse[list[dict]])
+async def list_grants(wallet_address: str, db: AsyncSession = Depends(get_db)):
     try:
-        now = int(datetime.now().timestamp())
-        grants = _grants_store.get(wallet_address, [])
+        repo = GrantRepository(db)
+        grants = await repo.list_by_grantor(wallet_address, include_revoked=False)
 
-        active_grants = [
-            g
+        response_data = [
+            {
+                "grant_id": g.grant_id,
+                "pda_address": g.pda_address,
+                "credential_pda": g.credential_pda,
+                "grantee_wallet": g.grantee_wallet,
+                "expires_at": g.expires_at.isoformat(),
+                "purpose": g.purpose,
+            }
             for g in grants
-            if g["revoked_at"] is None and g["expires_at"] > now
+            if g.expires_at > datetime.utcnow()
         ]
 
-        return ApiResponse(success=True, data=[AccessGrant(**g) for g in active_grants])
+        return ApiResponse(success=True, data=response_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.delete("/{wallet_address}/{grant_id}", response_model=ApiResponse[dict])
-async def revoke_grant(wallet_address: str, grant_id: str):
+async def revoke_grant(wallet_address: str, grant_id: str, db: AsyncSession = Depends(get_db)):
     try:
-        grants = _grants_store.get(wallet_address, [])
-        grant = next((g for g in grants if g["grant_id"] == grant_id), None)
+        repo = GrantRepository(db)
+        grant = await repo.get(grant_id)
 
-        if not grant:
-            raise HTTPException(status_code=404, detail="Grant not found")
+        if not grant or grant.grantor_wallet != wallet_address:
+            raise HTTPException(status_code=404, detail="Grant not found or unauthorized")
 
-        grant["revoked_at"] = int(datetime.now().timestamp())
+        await repo.revoke(grant_id)
+        await db.commit()
 
         return ApiResponse(success=True, data={"message": "Grant revoked"})
     except Exception as e:
+        await db.rollback()
         raise HTTPException(status_code=500, detail=str(e))

@@ -28,5 +28,11 @@
       "command": "npx",
       "args": ["-y", "@netlify/mcp"]
     }
-  }
+  },
+  "playwriter": {
+      "command": "npx",
+      "args": [
+        "playwriter@latest"
+      ]
+    }
 }

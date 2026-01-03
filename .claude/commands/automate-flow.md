@@ -32,7 +32,8 @@ Examples: ❌ update-feature (already efficient) | ✅ restart-servers (operatio
 
 ## Skill Improvement Check
 
-Evaluate: Does any skill need updates?
+  Evaluate if any skill was used in current session workflow, and
+  does it need any update to make it efficient and better.
 
 **Update skill if:**
 
