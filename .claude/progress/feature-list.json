@@ -2,7 +2,7 @@
   "version": "2.1.0",
   "project": "identity-asset-tokenization-platform",
   "created": "2026-01-01",
-  "updated": "2026-01-02T20:00:00Z",
+  "updated": "2026-01-03T22:45:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -279,6 +279,24 @@
         "Transaction submission helper",
         "PDA derivation for identity accounts",
         "Balance and account info queries"
+      ]
+    },
+    {
+      "id": "feat-012a",
+      "description": "PostgreSQL + SQLAlchemy database layer mimicking Solana on-chain storage",
+      "priority": "P0",
+      "status": "in_progress",
+      "phase": 6,
+      "acceptance_criteria": [
+        "PostgreSQL database schema with identity/credential/grant/verification tables",
+        "SQLAlchemy async ORM models matching Solana account structures",
+        "Alembic migrations for database versioning",
+        "PDA derivation service (deterministic, matches Solana logic)",
+        "Repository pattern (CRUD operations for all entities)",
+        "Replace in-memory stores with database queries",
+        "Store only hashes and metadata URIs (no sensitive data)",
+        "End-to-end test: form submission → backend processing → DB storage",
+        "Verification bits and field masks working correctly"
       ]
     },
     {
