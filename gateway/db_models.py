@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from sqlalchemy import Column, String, LargeBinary, DateTime, Boolean, Integer, ForeignKey, Index, JSON, Numeric
 from sqlalchemy.orm import relationship
-from database import Base
+from db_base import Base
 
 
 class Identity(Base):
