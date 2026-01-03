@@ -4,12 +4,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.credentials import CredentialResponse, CredentialData
 from models.common import ApiResponse
 from services.apisetu import apisetu_client
+from services.pda import pda_service
 from database import get_db
 from repositories.credential_repo import CredentialRepository
 import hashlib
 import uuid
 
 router = APIRouter(prefix="/credentials", tags=["Credentials"])
+
+# Default issuer DID (will be replaced with actual issuer in production)
+DEFAULT_ISSUER_DID = "did:solana:default-issuer"
 
 
 @router.get("/{wallet_address}", response_model=ApiResponse[list[CredentialResponse]])
@@ -40,6 +44,7 @@ async def fetch_and_tokenize_credential(
     wallet_address: str, request: CredentialData, db: AsyncSession = Depends(get_db)
 ):
     try:
+        # Fetch credential data from API Setu
         match request.credential_type:
             case "aadhaar":
                 data = await apisetu_client.fetch_aadhaar(
@@ -62,6 +67,13 @@ async def fetch_and_tokenize_credential(
             case _:
                 raise ValueError(f"Unknown credential type: {request.credential_type}")
 
+        # Derive PDA for this credential
+        pda_address, bump = pda_service.derive_credential_pda(
+            wallet_address=wallet_address,
+            credential_type=request.credential_type,
+            issuer_did=DEFAULT_ISSUER_DID,
+        )
+
         # Create credential in database
         cred_id = str(uuid.uuid4())
         claims_hash = hashlib.sha256(str(data).encode()).digest()  # 32-byte hash
@@ -69,12 +81,13 @@ async def fetch_and_tokenize_credential(
         repo = CredentialRepository(db)
         credential = await repo.create(
             credential_id=cred_id,
-            pda_address=f"{wallet_address}-{request.credential_type}",  # Placeholder PDA
+            pda_address=pda_address,
             owner_wallet=wallet_address,
             credential_type=request.credential_type,
             claims_hash=claims_hash,
+            issuer_did=DEFAULT_ISSUER_DID,
             issued_at=request.fetched_at,
-            bump=255,  # Placeholder bump
+            bump=bump,
         )
 
         # Commit transaction
@@ -91,6 +104,8 @@ async def fetch_and_tokenize_credential(
                 claims_summary={},
             ),
         )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=500, detail=str(e))

@@ -8,7 +8,7 @@ import type {
   AccessGrant,
   CreateIdentityRequest,
   UpdateIdentityRequest,
-  CredentialData,
+  CredentialRequest,
   CreateGrantRequest,
   UnsignedTransaction,
   TransactionReceipt,
@@ -212,7 +212,7 @@ export const credentialsApi = {
    */
   async fetchAndTokenize(
     walletAddress: string,
-    request: CredentialData
+    request: CredentialRequest
   ): Promise<CredentialResponse> {
     const { data } = await apiClient.post<ApiResponse<CredentialResponse>>(
       `/api/credentials/${walletAddress}`,

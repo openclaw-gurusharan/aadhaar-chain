@@ -4,17 +4,16 @@ import { useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useRouter, usePathname } from 'next/navigation';
 
-// Routes that require wallet connection
+// Routes that require wallet connection (redirect to landing if disconnected)
 const PROTECTED_ROUTES = [
   '/dashboard',
   '/credentials',
   '/identity',
-  '/verify',
   '/settings',
 ];
 
-// Public routes where wallet connection should redirect to dashboard
-const PUBLIC_ROUTES = [
+// Routes that should redirect to dashboard if wallet is connected
+const REDIRECT_TO_DASHBOARD_WHEN_CONNECTED = [
   '/',
 ];
 
@@ -28,10 +27,10 @@ export function WalletRouter() {
     const isProtectedRoute = PROTECTED_ROUTES.some(route =>
       pathname.startsWith(route)
     );
-    const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+    const shouldRedirectToDashboard = REDIRECT_TO_DASHBOARD_WHEN_CONNECTED.includes(pathname);
 
-    if (connected && isPublicRoute) {
-      // Wallet connected on public route → redirect to dashboard
+    if (connected && shouldRedirectToDashboard) {
+      // Wallet connected on landing → redirect to dashboard
       router.push('/dashboard');
     } else if (!connected && isProtectedRoute) {
       // Wallet disconnected on protected route → redirect to landing

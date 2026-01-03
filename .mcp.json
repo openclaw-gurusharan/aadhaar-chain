@@ -27,12 +27,13 @@
     "netlify": {
       "command": "npx",
       "args": ["-y", "@netlify/mcp"]
-    }
-  },
-  "playwriter": {
+    },
+    "playwriter": {
       "command": "npx",
       "args": [
-        "playwriter@latest"
+        "-y","playwriter@latest"
       ]
     }
-}
+  }
+  
+  }

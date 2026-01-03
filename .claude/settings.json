@@ -1,4 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__context7__*",
+      "mcp__token-efficient__*",
+      "mcp__context-graph__*",
+      "mcp__netlify__*",
+      "mcp__playwright__*"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
