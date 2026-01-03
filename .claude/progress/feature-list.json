@@ -126,7 +126,7 @@
     },
     {
       "id": "feat-005e",
-      "description": "Bidirectional wallet-based routing (connect→dashboard, disconnect→landing)",
+      "description": "Bidirectional wallet-based routing (connect\u2192dashboard, disconnect\u2192landing)",
       "priority": "P0",
       "status": "completed",
       "phase": 4,
@@ -317,14 +317,14 @@
       "id": "feat-012c",
       "description": "Phase 3: Implement PDA derivation service (deterministic, matches Solana logic)",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "completed",
       "phase": 6,
       "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 3: PDA Derivation Logic",
       "acceptance_criteria": [
         "Create gateway/services/pda.py with PDAService class",
-        "Implement derive_identity_pda(wallet_address) → (pda_address, bump)",
-        "Implement derive_credential_pda(wallet, credential_type, issuer_did) → (pda_address, bump)",
-        "Implement derive_grant_pda(credential_pda, grantor, purpose) → (pda_address, bump)",
+        "Implement derive_identity_pda(wallet_address) \u2192 (pda_address, bump)",
+        "Implement derive_credential_pda(wallet, credential_type, issuer_did) \u2192 (pda_address, bump)",
+        "Implement derive_grant_pda(credential_pda, grantor, purpose) \u2192 (pda_address, bump)",
         "Use solders library for deterministic derivation matching Solana",
         "PDA derivation logic tested and verified"
       ]
@@ -349,7 +349,7 @@
       "id": "feat-012e",
       "description": "Phase 5: Replace in-memory stores with database operations in route handlers",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "completed",
       "phase": 6,
       "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 5: Update Route Handlers",
       "acceptance_criteria": [
@@ -373,7 +373,7 @@
         "Create initial migration via alembic: alembic revision --autogenerate",
         "Run migration: alembic upgrade head",
         "Verify schema matches Solana account structures",
-        "End-to-end test: Form submission → Backend → PDA derivation → DB storage → Response",
+        "End-to-end test: Form submission \u2192 Backend \u2192 PDA derivation \u2192 DB storage \u2192 Response",
         "Test verification bits, field masks, expiry logic",
         "No sensitive data in database verified"
       ]
@@ -454,13 +454,13 @@
       "id": "feat-018",
       "description": "Unified credential verification page (DigiLocker-style)",
       "priority": "P0",
-      "status": "in_progress",
+      "status": "completed",
       "phase": 9,
       "plan_reference": ".claude/plans/gleaming-wiggling-bonbon.md",
       "acceptance_criteria": [
         "Unified /verify page listing all 5 credential types (Aadhaar, PAN, DL, Land Records, Education)",
         "Credential cards with icon, title, description, and verification status badge",
-        "Modal-based fetch flow (input → OTP → preview → confirm → store)",
+        "Modal-based fetch flow (input \u2192 OTP \u2192 preview \u2192 confirm \u2192 store)",
         "Credential-specific input forms with validation",
         "OTP verification for all credential types (Aadhaar-linked mobile)",
         "Data preview before storing in database",
@@ -493,7 +493,7 @@
   },
   "notes": {
     "ai_features": "Deferred - AI agents (fraud detection, privacy enforcement, behavioral monitoring) will be added in Phase 2 after core infrastructure is complete",
-    "architecture": "Backend built on Claude Agent SDK framework for future AI integration, but Phase 1 focuses on: API Setu → Solana tokenization → selective disclosure"
+    "architecture": "Backend built on Claude Agent SDK framework for future AI integration, but Phase 1 focuses on: API Setu \u2192 Solana tokenization \u2192 selective disclosure"
   },
   "metadata": {
     "total": 32,
