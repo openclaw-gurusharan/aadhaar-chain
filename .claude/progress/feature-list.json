@@ -283,20 +283,93 @@
     },
     {
       "id": "feat-012a",
-      "description": "PostgreSQL + SQLAlchemy database layer mimicking Solana on-chain storage",
+      "description": "Phase 1: Database infrastructure setup (config, dependencies, database.py)",
       "priority": "P0",
       "status": "in_progress",
       "phase": 6,
       "acceptance_criteria": [
-        "PostgreSQL database schema with identity/credential/grant/verification tables",
-        "SQLAlchemy async ORM models matching Solana account structures",
-        "Alembic migrations for database versioning",
-        "PDA derivation service (deterministic, matches Solana logic)",
-        "Repository pattern (CRUD operations for all entities)",
-        "Replace in-memory stores with database queries",
-        "Store only hashes and metadata URIs (no sensitive data)",
-        "End-to-end test: form submission → backend processing → DB storage",
-        "Verification bits and field masks working correctly"
+        "Add SQLAlchemy, asyncpg, alembic to requirements.txt",
+        "Configure database_url in gateway/config.py",
+        "Create gateway/database.py with async session factory",
+        "Initialize database connection in gateway/main.py",
+        "Create alembic.ini and alembic/env.py",
+        "Database connectivity verified with test query"
+      ]
+    },
+    {
+      "id": "feat-012b",
+      "description": "Phase 2: Create SQLAlchemy models (identity, credential, grant, verification)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "Identity model: wallet_address, pda_address, owner_pubkey, commitment hash, metadata_uri, timestamps, verification_bits, recovery_counter, bump",
+        "Credential model: credential_id, pda_address, owner_wallet (FK), credential_type, claims_hash (32 bytes), issuer_did, issued_at, expiry, metadata_uri, revoked, bump",
+        "AccessGrant model: grant_id, pda_address, credential_pda (FK), grantor/grantee wallets, purpose, expires_at, field_mask (u64), revoked, bump",
+        "Verification model: verification_id, wallet_address, credential_type, overall_status, progress, steps (JSONB), error, timestamps",
+        "All indexes and foreign keys properly defined",
+        "No sensitive data in models (hashes and URIs only)"
+      ]
+    },
+    {
+      "id": "feat-012c",
+      "description": "Phase 3: Implement PDA derivation service (deterministic, matches Solana logic)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "Create gateway/services/pda.py with PDAService class",
+        "Implement derive_identity_pda(wallet_address) → (pda_address, bump)",
+        "Implement derive_credential_pda(wallet, credential_type, issuer_did) → (pda_address, bump)",
+        "Implement derive_grant_pda(credential_pda, grantor, purpose) → (pda_address, bump)",
+        "Use solders library for deterministic derivation matching Solana",
+        "PDA derivation logic tested and verified"
+      ]
+    },
+    {
+      "id": "feat-012d",
+      "description": "Phase 4: Create repository layer (CRUD operations for all entities)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "Create gateway/repositories/identity_repo.py with create, get, update, set_verification_bit, get_by_pda methods",
+        "Create gateway/repositories/credential_repo.py with create, get, list_by_owner, update_revocation methods",
+        "Create gateway/repositories/grant_repo.py with create, get, list_by_credential, revoke methods",
+        "Create gateway/repositories/verification_repo.py with create, get, update_status, list_pending methods",
+        "All repositories use async/await with SQLAlchemy session",
+        "Repository methods tested with mock database"
+      ]
+    },
+    {
+      "id": "feat-012e",
+      "description": "Phase 5: Replace in-memory stores with database operations in route handlers",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "gateway/routes/identity.py - Replace in-memory store with IdentityRepository",
+        "gateway/routes/credentials.py - Replace in-memory store (line 9) with CredentialRepository",
+        "gateway/routes/verification.py - Replace in-memory store (line 10) with VerificationRepository",
+        "gateway/routes/grants.py - Replace in-memory store (line 10) with GrantRepository",
+        "All POST/GET/PUT/DELETE endpoints use database",
+        "API contract unchanged - only internal implementation changed"
+      ]
+    },
+    {
+      "id": "feat-012f",
+      "description": "Phase 6: Database migration and end-to-end testing",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 6,
+      "acceptance_criteria": [
+        "Create PostgreSQL database 'identity_platform'",
+        "Create initial migration via alembic: alembic revision --autogenerate",
+        "Run migration: alembic upgrade head",
+        "Verify schema matches Solana account structures",
+        "End-to-end test: Form submission → Backend → PDA derivation → DB storage → Response",
+        "Test verification bits, field masks, expiry logic",
+        "No sensitive data in database verified"
       ]
     },
     {
