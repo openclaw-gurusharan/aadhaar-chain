@@ -1,7 +1,8 @@
 {
-  "session_summary": "Auto-checkpoint: 25/32 features complete. State: IMPLEMENT. Health: OFFLINE. Current: feat-013",
-  "last_updated": "2026-01-03T11:55:50Z",
+  "session_summary": "Enhanced CLAUDE.md with state-to-skill loading pattern, updated /summary command and session-end.sh to auto-generate checkpoints. Next: Test workflow and continue with pending Solana program features.",
+  "last_updated": "2026-01-03T12:04:17Z",
   "current_feature": "feat-013",
+  "next_feature": "feat-013",
   "completed_features": 25,
   "pending_features": 4,
   "total_features": 32

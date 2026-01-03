@@ -23,3 +23,4 @@ feat-013/014: Solana Anchor Programs (identity-core, credential-vault)
 
 ## Progress
 15/19 features completed (79%)
+2026-01-03 12:04:23 UTC - Enhanced CLAUDE.md with state-to-skill loading pattern, updated /summary command and session-end.sh to auto-generate checkpoints. Progress: 25/32 features. Next: Test workflow and continue with pending Solana program features.
