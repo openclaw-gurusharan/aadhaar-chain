@@ -2,7 +2,7 @@
   "version": "2.1.0",
   "project": "identity-asset-tokenization-platform",
   "created": "2026-01-01",
-  "updated": "2026-01-03T22:45:00Z",
+  "updated": "2026-01-03T23:30:00Z",
   "features": [
     {
       "id": "feat-001",
@@ -449,25 +449,46 @@
         "Error handling across all layers",
         "Browser testing for user flows"
       ]
+    },
+    {
+      "id": "feat-018",
+      "description": "Unified credential verification page (DigiLocker-style)",
+      "priority": "P0",
+      "status": "in_progress",
+      "phase": 9,
+      "plan_reference": ".claude/plans/gleaming-wiggling-bonbon.md",
+      "acceptance_criteria": [
+        "Unified /verify page listing all 5 credential types (Aadhaar, PAN, DL, Land Records, Education)",
+        "Credential cards with icon, title, description, and verification status badge",
+        "Modal-based fetch flow (input → OTP → preview → confirm → store)",
+        "Credential-specific input forms with validation",
+        "OTP verification for all credential types (Aadhaar-linked mobile)",
+        "Data preview before storing in database",
+        "Real API integration with backend /api/credentials endpoints",
+        "Credentials page displays real data from database",
+        "State management via Zustand store",
+        "Responsive design and accessibility"
+      ]
     }
   ],
   "summary": {
-    "total": 19,
+    "total": 20,
     "by_priority": {
-      "P0": 15,
+      "P0": 16,
       "P1": 4
     },
     "by_status": {
       "pending": 5,
-      "in_progress": 2,
+      "in_progress": 3,
       "completed": 24
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
       "5": "Backend (FastAPI + API Setu + Routes)",
-      "6": "Solana Service Layer",
+      "6": "Solana Service Layer + Database",
       "7": "Solana Programs",
-      "8": "Integration & Testing"
+      "8": "Integration & Testing",
+      "9": "Unified Verification Page"
     }
   },
   "notes": {
