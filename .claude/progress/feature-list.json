@@ -287,6 +287,7 @@
       "priority": "P0",
       "status": "in_progress",
       "phase": 6,
+      "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 1: Database Infrastructure Setup",
       "acceptance_criteria": [
         "Add SQLAlchemy, asyncpg, alembic to requirements.txt",
         "Configure database_url in gateway/config.py",
@@ -302,6 +303,7 @@
       "priority": "P0",
       "status": "pending",
       "phase": 6,
+      "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 2: Database Models (Mirrors Solana Accounts)",
       "acceptance_criteria": [
         "Identity model: wallet_address, pda_address, owner_pubkey, commitment hash, metadata_uri, timestamps, verification_bits, recovery_counter, bump",
         "Credential model: credential_id, pda_address, owner_wallet (FK), credential_type, claims_hash (32 bytes), issuer_did, issued_at, expiry, metadata_uri, revoked, bump",
@@ -317,6 +319,7 @@
       "priority": "P0",
       "status": "pending",
       "phase": 6,
+      "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 3: PDA Derivation Logic",
       "acceptance_criteria": [
         "Create gateway/services/pda.py with PDAService class",
         "Implement derive_identity_pda(wallet_address) → (pda_address, bump)",
@@ -332,6 +335,7 @@
       "priority": "P0",
       "status": "pending",
       "phase": 6,
+      "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 4: Database Operations Layer",
       "acceptance_criteria": [
         "Create gateway/repositories/identity_repo.py with create, get, update, set_verification_bit, get_by_pda methods",
         "Create gateway/repositories/credential_repo.py with create, get, list_by_owner, update_revocation methods",
@@ -347,6 +351,7 @@
       "priority": "P0",
       "status": "pending",
       "phase": 6,
+      "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 5: Update Route Handlers",
       "acceptance_criteria": [
         "gateway/routes/identity.py - Replace in-memory store with IdentityRepository",
         "gateway/routes/credentials.py - Replace in-memory store (line 9) with CredentialRepository",
@@ -362,6 +367,7 @@
       "priority": "P0",
       "status": "pending",
       "phase": 6,
+      "plan_reference": ".claude/plans/tranquil-cuddling-bentley.md - Phase 6: Migration and Testing",
       "acceptance_criteria": [
         "Create PostgreSQL database 'identity_platform'",
         "Create initial migration via alembic: alembic revision --autogenerate",
