@@ -1,6 +1,5 @@
 {
-  "state": "IMPLEMENT",
-  "entered": "2026-01-04T001541+05:30",
-  "health": "HEALTHY",
-  "last_updated": 1767466057
+  "current_state": "IMPLEMENT",
+  "last_updated": "2026-01-04T13:31:58.876424",
+  "health_status": "HEALTHY"
 }
