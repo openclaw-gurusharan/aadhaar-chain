@@ -34,5 +34,8 @@ class Settings(BaseSettings):
     # IPFS
     ipfs_gateway_url: str = "https://ipfs.io/ipfs"
 
+    # Mock Mode (for testing without real API Setu)
+    mock_mode: bool = True
+
 
 settings = Settings()

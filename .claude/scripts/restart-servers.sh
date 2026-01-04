@@ -1,125 +1,144 @@
 #!/bin/bash
-# Restart frontend (3000) and gateway (8000) servers
-# Usage: restart-servers.sh [--no-logs]
-# Exit: 0 = both healthy, 1 = startup failed, 2 = timeout
-# Logs: /tmp/server-logs/frontend.log, /tmp/server-logs/gateway.log
+# restart-servers.sh
+#
+# Purpose: Kill processes on ports 8000 and 3000, then start frontend and backend servers
+#
+# Usage: ./restart-servers.sh [--no-frontend|--no-backend]
 
-# ─────────────────────────────────────────────────────────────────
-# Config helper
-# ─────────────────────────────────────────────────────────────────
-CONFIG="$PWD/.claude/config/project.json"
-get_config() { jq -r ".$1 // empty" "$CONFIG" 2>/dev/null || echo "$2"; }
+set -e
 
-FRONTEND_PORT=$(get_config "dev_server_port" "3000")
-GATEWAY_PORT="8000"
-TIMEOUT=30
-LOGS_DIR="/tmp/server-logs"
+FRONTEND_PORT=3000
+BACKEND_PORT=8000
+NO_FRONTEND=false
+NO_BACKEND=false
 
-mkdir -p "$LOGS_DIR"
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --no-frontend)
+      NO_FRONTEND=true
+      shift
+      ;;
+    --no-backend)
+      NO_BACKEND=true
+      shift
+      ;;
+    *)
+      echo "Usage: $0 [--no-frontend] [--no-backend]"
+      exit 1
+      ;;
+  esac
+done
 
-# ─────────────────────────────────────────────────────────────────
-# Kill existing servers
-# ─────────────────────────────────────────────────────────────────
+echo "=== Restarting Servers ==="
+
+# ============================================================================
+# Kill existing processes
+# ============================================================================
+
 kill_port() {
-    local port=$1
-    local pid=$(lsof -ti:$port 2>/dev/null)
-    if [ -n "$pid" ]; then
-        echo "Killing process on port $port (PID: $pid)"
-        kill -9 $pid 2>/dev/null
-        sleep 1
-    fi
+  local port=$1
+  local pid=$(lsof -ti:$port 2>/dev/null || true)
+
+  if [ -n "$pid" ]; then
+    echo "Killing process on port $port (PID: $pid)"
+    kill -9 $pid 2>/dev/null || true
+    sleep 1
+  else
+    echo "No process found on port $port"
+  fi
 }
 
-echo "=== Stopping existing servers ==="
-kill_port $FRONTEND_PORT
-kill_port $GATEWAY_PORT
-
-# ─────────────────────────────────────────────────────────────────
-# Start servers
-# ─────────────────────────────────────────────────────────────────
-echo "=== Starting servers ==="
-
-# Start frontend
-cd frontend
-if [ "$1" != "--no-logs" ]; then
-    npm run dev > "$LOGS_DIR/frontend.log" 2>&1 &
-else
-    npm run dev >/dev/null 2>&1 &
-fi
-FRONTEND_PID=$!
-echo "Frontend started (PID: $FRONTEND_PID, port: $FRONTEND_PORT)"
-cd ..
-
-# Start gateway
-cd gateway
-if [ "$1" != "--no-logs" ]; then
-    uvicorn main:app --reload --port $GATEWAY_PORT > "$LOGS_DIR/gateway.log" 2>&1 &
-else
-    uvicorn main:app --reload --port $GATEWAY_PORT >/dev/null 2>&1 &
-fi
-GATEWAY_PID=$!
-echo "Gateway started (PID: $GATEWAY_PID, port: $GATEWAY_PORT)"
-cd ..
-
-# ─────────────────────────────────────────────────────────────────
-# Health checks
-# ─────────────────────────────────────────────────────────────────
-echo "=== Waiting for servers to be healthy ==="
-
-wait_for_health() {
-    local url=$1
-    local name=$2
-    local elapsed=0
-
-    while [ $elapsed -lt $TIMEOUT ]; do
-        if curl -s "$url" | grep -q "healthy\|status"; then
-            echo "✓ $name is healthy"
-            return 0
-        fi
-        sleep 1
-        ((elapsed++))
-        echo "  Waiting for $name... (${elapsed}s)"
-    done
-
-    echo "✗ $name failed to start within ${TIMEOUT}s"
-    return 1
-}
-
-# Check frontend
-if ! wait_for_health "http://localhost:$FRONTEND_PORT" "Frontend"; then
-    echo "=== Frontend startup failed ==="
-    if [ "$1" != "--no-logs" ]; then
-        echo "Frontend log:"
-        tail -20 "$LOGS_DIR/frontend.log"
-    fi
-    exit 1
+if [ "$NO_FRONTEND" = false ]; then
+  kill_port $FRONTEND_PORT
 fi
 
-# Check gateway
-if ! wait_for_health "http://localhost:$GATEWAY_PORT/api/health" "Gateway"; then
-    echo "=== Gateway startup failed ==="
-    if [ "$1" != "--no-logs" ]; then
-        echo "Gateway log:"
-        tail -20 "$LOGS_DIR/gateway.log"
-    fi
-    exit 1
+if [ "$NO_BACKEND" = false ]; then
+  kill_port $BACKEND_PORT
 fi
+
+# ============================================================================
+# Start backend (FastAPI)
+# ============================================================================
+
+if [ "$NO_BACKEND" = false ]; then
+  echo ""
+  echo "Starting backend on port $BACKEND_PORT..."
+
+  if [ -d "gateway" ]; then
+    cd gateway
+    nohup uvicorn main:app --reload --host 0.0.0.0 --port $BACKEND_PORT > ../logs/backend.log 2>&1 &
+    BACKEND_PID=$!
+    echo "Backend started (PID: $BACKEND_PID, logs: logs/backend.log)"
+    cd ..
+  else
+    echo "Warning: gateway/ directory not found, skipping backend" >&2
+  fi
+fi
+
+# ============================================================================
+# Start frontend (Next.js)
+# ============================================================================
+
+if [ "$NO_FRONTEND" = false ]; then
+  echo ""
+  echo "Starting frontend on port $FRONTEND_PORT..."
+
+  if [ -d "frontend" ]; then
+    cd frontend
+    nohup npm run dev > ../logs/frontend.log 2>&1 &
+    FRONTEND_PID=$!
+    echo "Frontend started (PID: $FRONTEND_PID, logs: logs/frontend.log)"
+    cd ..
+  else
+    echo "Warning: frontend/ directory not found, skipping frontend" >&2
+  fi
+fi
+
+# ============================================================================
+# Wait for servers to be ready
+# ============================================================================
 
 echo ""
-echo "=== Both servers healthy ==="
-echo "Frontend: http://localhost:$FRONTEND_PORT"
-echo "Gateway:  http://localhost:$GATEWAY_PORT"
-echo "Logs:     $LOGS_DIR/"
+echo "Waiting for servers to start..."
 
-# Save server info for later use
-cat > "$LOGS_DIR/server-info.json" << EOF
-{
-  "frontend_port": $FRONTEND_PORT,
-  "gateway_port": $GATEWAY_PORT,
-  "frontend_pid": $FRONTEND_PID,
-  "gateway_pid": $GATEWAY_PID,
-  "started_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+wait_for_service() {
+  local url=$1
+  local name=$2
+  local max_wait=30
+  local count=0
+
+  while [ $count -lt $max_wait ]; do
+    if curl -sf "$url" > /dev/null 2>&1; then
+      echo "✓ $name is ready"
+      return 0
+    fi
+    sleep 1
+    count=$((count + 1))
+    echo -n "."
+  done
+
+  echo ""
+  echo "✗ $name failed to start within ${max_wait}s" >&2
+  return 1
 }
-EOF
+
+if [ "$NO_FRONTEND" = false ]; then
+  wait_for_service "http://localhost:$FRONTEND_PORT" "Frontend" || exit 1
+fi
+
+if [ "$NO_BACKEND" = false ]; then
+  wait_for_service "http://localhost:$BACKEND_PORT/api/health" "Backend" || exit 1
+fi
+
+# ============================================================================
+# Summary
+# ============================================================================
+
+echo ""
+echo "=== Servers restarted successfully ==="
+echo "Frontend: http://localhost:$FRONTEND_PORT"
+echo "Backend:  http://localhost:$BACKEND_PORT/api/health"
+echo "Logs:     logs/frontend.log, logs/backend.log"
 
 exit 0

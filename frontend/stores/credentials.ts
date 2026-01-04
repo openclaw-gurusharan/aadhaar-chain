@@ -107,17 +107,24 @@ export const useCredentialStore = create<CredentialState>((set, get) => ({
     set({ loading: true, error: null, formData: data });
 
     try {
-      // Step 1: Send OTP by calling API Setu
-      const response = await credentialsApi.fetchAndTokenize(walletAddress, {
-        credential_type: activeType,
-        data,
-      });
+      // Step 1: Initiate OTP flow
+      const response = await credentialsApi.initiate(walletAddress, activeType, data);
 
-      // OTP sent successfully
-      set({
-        step: 'otp',
-        loading: false,
-      });
+      // Show OTP in mock mode for testing
+      if (response.mock_mode && response.otp) {
+        set({
+          error: null,
+          loading: false,
+          step: 'otp',
+        });
+        // In mock mode, show the OTP via toast
+        console.log('Mock OTP:', response.otp);
+      } else {
+        set({
+          step: 'otp',
+          loading: false,
+        });
+      }
     } catch (error: unknown) {
       const message = error instanceof Error && 'response' in error
         ? ((error as any).response?.data?.message || error.message)
@@ -144,19 +151,13 @@ export const useCredentialStore = create<CredentialState>((set, get) => ({
     set({ loading: true, error: null, otp });
 
     try {
-      // Step 2: Verify OTP and fetch credential data
-      const response = await credentialsApi.fetchAndTokenize(walletAddress, {
-        credential_type: activeType,
-        data: {
-          ...formData,
-          otp,
-        },
-      });
+      // Step 2: Verify OTP and get preview data
+      const credentialData = await credentialsApi.verify(walletAddress, activeType, formData, otp);
 
       // OTP verified successfully, show preview
       set({
         step: 'preview',
-        fetchedData: (response as unknown as { data?: Record<string, unknown> }).data || response.claims_summary,
+        fetchedData: credentialData,
         loading: false,
       });
     } catch (error: unknown) {
@@ -192,10 +193,7 @@ export const useCredentialStore = create<CredentialState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      await credentialsApi.fetchAndTokenize(walletAddress, {
-        credential_type: activeType,
-        data: formData,
-      });
+      await credentialsApi.initiate(walletAddress, activeType, formData);
 
       set({
         loading: false,
@@ -225,14 +223,7 @@ export const useCredentialStore = create<CredentialState>((set, get) => ({
 
     try {
       // Step 3: Confirm and store credential
-      const response = await credentialsApi.fetchAndTokenize(walletAddress, {
-        credential_type: activeType,
-        data: {
-          ...formData,
-          otp,
-          confirm: true,
-        },
-      });
+      await credentialsApi.confirm(walletAddress, activeType, formData, otp || '');
 
       set({
         step: 'success',

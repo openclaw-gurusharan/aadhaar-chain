@@ -106,6 +106,12 @@ FIX_BROKEN ← Any state (when health check fails)
 | `mcp-builder` | Build MCP servers | MCP development |
 | `browser-testing` | Chrome automation | UI testing |
 
+### Learning Skills (1)
+
+| Skill | Purpose | Trigger |
+|-------|---------|---------|
+| `learning-loop` | Extract patterns, generate recommendations | Manual `/learning-loop` |
+
 ### Domain Skills (Variable)
 
 | Skill | Purpose |
@@ -207,6 +213,8 @@ FIX_BROKEN ← Any state (when health check fails)
 | `context_list_traces` | List with pagination |
 | `context_list_categories` | Category breakdown |
 
+**Database**: `.traces/chroma/` (persistent, Voyage AI 1024-dim embeddings)
+
 ---
 
 ## File Structure
@@ -260,7 +268,8 @@ project/
 │   ├── progress/
 │   │   ├── state.json        # Current state
 │   │   ├── feature-list.json # Features with status
-│   │   └── traces.json       # Decision traces (local)
+│   │   └── traces/           # Decision traces database
+│   │       └── chroma/       # ChromaDB + 1024-dim embeddings
 │   ├── scripts/              # Project-specific automation
 │   │   ├── get-current-feature.sh
 │   │   ├── health-check.sh
@@ -298,19 +307,25 @@ project/
 
 ---
 
-## Learning Loop (Phase 3 - Planned)
+## Learning Loop (Phase 3 - Implemented)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                   LEARNING LOOP                                 │
 │                                                                 │
-│  1. Session ends → Store traces                                 │
-│  2. Weekly: Query traces by category                            │
-│  3. Extract patterns: "When X, do Y" (>3 occurrences)          │
-│  4. Update skill references with patterns                       │
-│  5. Generate .claude/scripts/ for repeated workflows            │
+│  Trigger: Manual `/learning-loop` or threshold suggestion       │
+│  1. Query traces by category (semantic search)                  │
+│  2. Extract patterns: "When X, do Y" (>3 occurrences)          │
+│  3. AskUserQuestion: "Recommend creating script for Y?"         │
+│  4. If approved: Update skill refs + generate .claude/scripts/  │
 └─────────────────────────────────────────────────────────────────┘
 ```
+
+### Trigger
+
+- **Manual**: User invokes `/learning-loop` when wanting pattern analysis
+- **Suggestion**: Agent suggests after N new traces accumulate
+- **Approval**: Uses `AskUserQuestion` for user consent on recommendations
 
 ### Pattern Extraction Rules
 
@@ -403,10 +418,10 @@ project/
   - `~/.claude/cache/` - Hash-based caching
   - State-specific context compilation
 
-- **Phase 3: Learning Loop** - (Planned)
-  - Pattern extraction from traces
-  - Auto-update skill references
-  - Generate automation scripts
+- **Phase 3: Learning Loop** - Implemented (manual trigger)
+  - `learning-loop` skill for pattern extraction
+  - Semantic search with AskUserQuestion approval
+  - Auto-update skill references + scripts
 
 ### v2.0 (Previous)
 

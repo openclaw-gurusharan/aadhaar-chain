@@ -208,7 +208,71 @@ export const credentialsApi = {
   },
 
   /**
-   * Fetch from API Setu and tokenize credential
+   * Step 1: Initiate credential fetch (send OTP)
+   */
+  async initiate(
+    walletAddress: string,
+    credentialType: string,
+    formData: Record<string, string>
+  ): Promise<{ session_id: string; otp?: string; mock_mode: boolean }> {
+    const { data } = await apiClient.post<ApiResponse<{ session_id: string; otp?: string; mock_mode: boolean }>>(
+      `/api/credentials/${walletAddress}/initiate`,
+      { credential_type: credentialType, data: formData }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to initiate credential fetch');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Step 2: Verify OTP and get preview data
+   */
+  async verify(
+    walletAddress: string,
+    credentialType: string,
+    formData: Record<string, string>,
+    otp: string
+  ): Promise<Record<string, unknown>> {
+    const { data } = await apiClient.post<ApiResponse<{ credential_data: Record<string, unknown> }>>(
+      `/api/credentials/${walletAddress}/verify`,
+      { credential_type: credentialType, data: formData, otp }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'OTP verification failed');
+    }
+
+    return data.data.credential_data;
+  },
+
+  /**
+   * Step 3: Confirm and store credential
+   */
+  async confirm(
+    walletAddress: string,
+    credentialType: string,
+    formData: Record<string, string>,
+    otp: string
+  ): Promise<CredentialResponse> {
+    const { data } = await apiClient.post<ApiResponse<CredentialResponse>>(
+      `/api/credentials/${walletAddress}/confirm`,
+      { credential_type: credentialType, data: formData, otp }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to store credential');
+    }
+
+    toast.success('Credential stored successfully');
+    return data.data;
+  },
+
+  /**
+   * Legacy: Fetch from API Setu and tokenize credential (single-step)
+   * Use initiate -> verify -> confirm instead
    */
   async fetchAndTokenize(
     walletAddress: string,
