@@ -1,8 +1,8 @@
 {
-  "session_summary": "Implemented 3-step OTP credential verification flow with mock mode. Updated global CLAUDE.md for proactive skill loading enforcement. Next: Browser test full flow or start Solana program (feat-013).",
-  "last_updated": "2026-01-04T13:32:00.298795",
-  "current_feature": null,
-  "next_feature": "feat-013",
+  "session_summary": "Reorganized automation scripts: moved templates to initialization skill, created copy-scripts.sh, fixed get-current-feature JSON parsing, improved health-check with infrastructure-first checks. Found PostgreSQL error. Next: Fix PostgreSQL and verify health.",
+  "last_updated": "2026-01-04T14:45:09+05:30",
+  "current_feature": "feat-013",
+  "next_feature": "feat-014",
   "completed_features": 28,
   "pending_features": 4,
   "total_features": 32

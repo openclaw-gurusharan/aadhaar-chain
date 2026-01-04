@@ -30,3 +30,10 @@ feat-013/014: Solana Anchor Programs (identity-core, credential-vault)
 Implemented 3-step OTP credential flow with mock mode. Browser testing pending.
 Progress: 28/32 features complete
 [2026-01-04 13:32] Session: Implemented OTP credential flow + CLAUDE.md updates
+
+2026-01-04 14:45:23 - Script reorganization session
+- Reorganized automation scripts into initialization skill
+- Created copy-scripts.sh, restart-servers.sh, improved health-check.sh
+- Fixed JSON parsing in get-current-feature.sh
+- 28/32 features complete, current: feat-013
+
