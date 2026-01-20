@@ -10,13 +10,14 @@ pydantic>=2.5.0
 # Claude Agent SDK
 claude-agent-sdk>=0.1.0
 
-# Solana (0.30.x with compatible anchorpy)
-solders>=0.15.0,<0.16.0
-solana>=0.30.0,<0.31.0
-anchorpy==0.17.0
+# Solana - use compatible versions per anchorpy changelog
+# anchorpy 0.19.0 requires: solders 0.20.0, solana-py 0.32.0
+solders==0.20.0
+solana==0.32.0
+anchorpy==0.19.0
 
-# HTTP Client (0.23.x for solana 0.30.x compatibility)
-httpx>=0.23.0,<0.24.0
+# HTTP Client - compatible with solana 0.32.0
+httpx>=0.24.0
 
 # Database
 sqlalchemy[asyncio]>=2.0.0
