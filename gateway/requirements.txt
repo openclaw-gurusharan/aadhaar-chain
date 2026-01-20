@@ -10,9 +10,9 @@ pydantic>=2.5.0
 # Claude Agent SDK
 claude-agent-sdk>=0.1.0
 
-# Solana
+# Solana (0.30.x for compatibility with anchorpy)
 solders>=0.27.1
-solana>=0.36.10
+solana>=0.30.0,<0.31.0
 anchorpy>=0.19.0
 
 # HTTP Client
