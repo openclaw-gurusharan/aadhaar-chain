@@ -11,7 +11,7 @@ pydantic>=2.5.0
 claude-agent-sdk>=0.1.0
 
 # Solana (0.30.x for compatibility with anchorpy)
-solders>=0.27.1
+solders>=0.15.0,<0.16.0
 solana>=0.30.0,<0.31.0
 anchorpy>=0.19.0
 
