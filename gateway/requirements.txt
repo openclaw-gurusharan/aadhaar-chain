@@ -15,8 +15,8 @@ solders>=0.27.1
 solana>=0.30.0,<0.31.0
 anchorpy>=0.19.0
 
-# HTTP Client
-httpx>=0.26.0
+# HTTP Client (0.23.x for solana 0.30.x compatibility)
+httpx>=0.23.0,<0.24.0
 
 # Database
 sqlalchemy[asyncio]>=2.0.0
