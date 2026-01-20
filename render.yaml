@@ -1,0 +1,29 @@
+services:
+  # Type: Web Service
+  - type: web
+
+    # Service name
+    name: identity-aadhar-gateway
+
+    # Runtime: Docker
+    runtime: docker
+
+    # Docker configuration
+    dockerContext: ./gateway
+    dockerfilePath: ./gateway/Dockerfile
+
+    # Environment variables
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12
+      - key: MOCK_MODE
+        value: true
+
+    # Health check path
+    healthCheckPath: /api/health
+
+# Database (optional - uncomment to add)
+# databases:
+#   - name: identity-db
+#     databaseName: identity_db
+#     user: identity_user
