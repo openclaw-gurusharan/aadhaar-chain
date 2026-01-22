@@ -28,6 +28,16 @@ from .common import (
     SignedTransaction,
     TransactionReceipt,
 )
+from .auth import (
+    LoginRequest,
+    SessionInfo,
+    ConnectedAppInfo,
+    UserResponse,
+    LoginResponse,
+    ValidateResponse,
+    ConnectedAppsResponse,
+    SessionsResponse,
+)
 
 __all__ = [
     # Identity
@@ -56,4 +66,13 @@ __all__ = [
     "UnsignedTransaction",
     "SignedTransaction",
     "TransactionReceipt",
+    # Auth
+    "LoginRequest",
+    "SessionInfo",
+    "ConnectedAppInfo",
+    "UserResponse",
+    "LoginResponse",
+    "ValidateResponse",
+    "ConnectedAppsResponse",
+    "SessionsResponse",
 ]

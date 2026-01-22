@@ -19,7 +19,15 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
 
     # Anthropic / Claude Agent SDK
-    anthropic_api_key: str
+    # Supports both standard API key and z.ai GLM 4.7 proxy
+    anthropic_api_key: str | None = None
+    anthropic_auth_token: str | None = None
+    anthropic_base_url: str | None = None
+
+    # GLM 4.7 model overrides (optional, for z.ai proxy)
+    anthropic_default_haiku_model: str | None = None
+    anthropic_default_sonnet_model: str | None = None
+    anthropic_default_opus_model: str | None = None
 
     # Solana
     solana_rpc_url: str = "https://api.devnet.solana.com"
@@ -36,6 +44,21 @@ class Settings(BaseSettings):
 
     # Mock Mode (for testing without real API Setu)
     mock_mode: bool = True
+
+    # SSO / Session
+    session_secret: str = "change-this-in-production"
+    session_duration_days: int = 30
+    cookie_domain: str = ".aadharcha.in"  # Production
+    sso_allowed_origins: list[str] = [
+        "http://localhost:3000",  # identity-aadhar
+        "http://localhost:3001",  # FlatWatch
+        "http://localhost:3002",  # ONDC Buyer
+        "http://localhost:3003",  # ONDC Seller
+        "https://aadharcha.in",
+        "https://flatwatch.aadharcha.in",
+        "https://ondcbuyer.aadharcha.in",
+        "https://ondcseller.aadharcha.in",
+    ]
 
 
 settings = Settings()

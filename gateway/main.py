@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
 from database import init_db, close_db
-from routes import identity, credentials, verification, transaction, grants
+from routes import identity, credentials, verification, transaction, grants, auth
 
 
 @asynccontextmanager
@@ -41,9 +41,9 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=settings.sso_allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -53,6 +53,7 @@ app.include_router(credentials.router, prefix=settings.api_prefix)
 app.include_router(verification.router, prefix=settings.api_prefix)
 app.include_router(transaction.router, prefix=settings.api_prefix)
 app.include_router(grants.router, prefix=settings.api_prefix)
+app.include_router(auth.router, prefix=settings.api_prefix)
 
 
 @app.get("/api/health")

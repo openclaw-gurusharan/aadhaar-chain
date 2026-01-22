@@ -191,3 +191,62 @@ class Verification(Base):
         Index("idx_verification_status", "overall_status"),
         Index("idx_verification_created", "created_at"),
     )
+
+
+class Session(Base):
+    """SSO session for cross-subdomain authentication."""
+    __tablename__ = "sessions"
+
+    # Primary key
+    id = Column(Integer, primary_key=True, index=True)
+
+    # User identifiers
+    user_id = Column(String(44), ForeignKey("identities.wallet_address"), nullable=False, index=True)
+
+    # Session token (cryptographically secure)
+    session_token = Column(String(128), unique=True, nullable=False, index=True)
+
+    # Authentication method
+    auth_method = Column(String(20), default="wallet")  # "wallet", "email", "otp"
+
+    # Session metadata
+    user_agent = Column(String(512), nullable=True)
+    ip_address = Column(String(45), nullable=True)  # IPv6 compatible
+
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_active = Column(DateTime, default=datetime.utcnow, nullable=False)
+    expires_at = Column(DateTime, nullable=False, index=True)
+
+    # Status
+    is_revoked = Column(Boolean, default=False, index=True)
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_session_user", "user_id"),
+        Index("idx_session_token", "session_token"),
+        Index("idx_session_expires", "expires_at"),
+        Index("idx_session_revoked", "is_revoked"),
+    )
+
+
+class ConnectedApp(Base):
+    """Connected apps tracking for SSO ecosystem."""
+    __tablename__ = "connected_apps"
+
+    # Primary key
+    id = Column(Integer, primary_key=True, index=True)
+
+    # User and app identifiers
+    user_id = Column(String(44), ForeignKey("identities.wallet_address"), nullable=False, index=True)
+    app_name = Column(String(100), nullable=False, index=True)  # "flatwatch", "ondc_buyer", "ondc_seller"
+
+    # Timestamps
+    first_accessed = Column(DateTime, default=datetime.utcnow, nullable=False)
+    last_accessed = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Indexes
+    __table_args__ = (
+        Index("idx_connected_app_user", "user_id"),
+        Index("idx_connected_app_name", "app_name"),
+    )

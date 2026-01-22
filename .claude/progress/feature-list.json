@@ -469,16 +469,93 @@
         "State management via Zustand store",
         "Responsive design and accessibility"
       ]
+    },
+    {
+      "id": "feat-019",
+      "description": "SSO: Session service (gateway/services/session.py)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 10,
+      "plan_reference": "Cookie-based SSO Plan - Phase 1",
+      "acceptance_criteria": [
+        "create_session() - Generate session token with 30-day expiry",
+        "set_session_cookie() - Set cookie with Domain=.aadharcha.in",
+        "clear_session_cookie() - Clear session cookie on logout",
+        "validate_session() - Validate session token and return user_id",
+        "SESSION_DURATION = 30 days",
+        "COOKIE_DOMAIN = .aadharcha.in (works across subdomains)"
+      ]
+    },
+    {
+      "id": "feat-020",
+      "description": "SSO: Add database models (Session, ConnectedApp)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 10,
+      "plan_reference": "Cookie-based SSO Plan - Phase 1",
+      "acceptance_criteria": [
+        "Session model: user_id, session_token, auth_method, user_agent, ip_address, created_at, last_active, expires_at, is_revoked",
+        "ConnectedApp model: user_id, app_name, first_accessed, last_accessed",
+        "Indexes on session_token and expires_at",
+        "Foreign key to identities.wallet_address",
+        "Alembic migration created and run"
+      ]
+    },
+    {
+      "id": "feat-021",
+      "description": "SSO: Auth routes (login, logout, validate, me)",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 10,
+      "plan_reference": "Cookie-based SSO Plan - Phase 1",
+      "acceptance_criteria": [
+        "POST /api/auth/login - Login with wallet/email, set SSO cookie",
+        "POST /api/auth/logout - Logout, clear SSO cookie",
+        "GET /api/auth/validate - Validate session for child apps",
+        "GET /api/auth/me - Get current user from cookie",
+        "All routes return user data with wallet_address",
+        "Session validation checks token, expiry, and revocation status"
+      ]
+    },
+    {
+      "id": "feat-022",
+      "description": "SSO: Configure CORS for subdomains",
+      "priority": "P0",
+      "status": "pending",
+      "phase": 10,
+      "plan_reference": "Cookie-based SSO Plan - Phase 1",
+      "acceptance_criteria": [
+        "CORS configured for aadharcha.in, flatwatch.aadharcha.in, ondcbuyer.aadharcha.in, ondcseller.aadharcha.in",
+        "allow_credentials=True for cookie support",
+        "allow_methods includes GET, POST, OPTIONS, PUT, DELETE",
+        "allow_headers includes all headers",
+        "Local development: localhost:3000-3003"
+      ]
+    },
+    {
+      "id": "feat-023",
+      "description": "SSO: Dashboard - Connected Apps and Active Sessions UI",
+      "priority": "P1",
+      "status": "pending",
+      "phase": 11,
+      "plan_reference": "Cookie-based SSO Plan - Phase 3",
+      "acceptance_criteria": [
+        "Connected Apps section - FlatWatch, ONDC Buyer, ONDC Seller with last access time",
+        "Active Sessions section - All devices/sessions with revoke button",
+        "Quick Login Links - Direct links to child apps (auto-logged in)",
+        "App registration endpoint for child apps",
+        "Session management API (list, revoke specific session)"
+      ]
     }
   ],
   "summary": {
-    "total": 20,
+    "total": 23,
     "by_priority": {
-      "P0": 16,
+      "P0": 19,
       "P1": 4
     },
     "by_status": {
-      "pending": 5,
+      "pending": 9,
       "in_progress": 3,
       "completed": 24
     },
@@ -488,7 +565,9 @@
       "6": "Solana Service Layer + Database",
       "7": "Solana Programs",
       "8": "Integration & Testing",
-      "9": "Unified Verification Page"
+      "9": "Unified Verification Page",
+      "10": "SSO Infrastructure (Session, Auth Routes, CORS)",
+      "11": "SSO Dashboard UI"
     }
   },
   "notes": {
