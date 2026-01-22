@@ -474,7 +474,7 @@
       "id": "feat-019",
       "description": "SSO: Session service (gateway/services/session.py)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 10,
       "plan_reference": "Cookie-based SSO Plan - Phase 1",
       "acceptance_criteria": [
@@ -490,7 +490,7 @@
       "id": "feat-020",
       "description": "SSO: Add database models (Session, ConnectedApp)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 10,
       "plan_reference": "Cookie-based SSO Plan - Phase 1",
       "acceptance_criteria": [
@@ -505,7 +505,7 @@
       "id": "feat-021",
       "description": "SSO: Auth routes (login, logout, validate, me)",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 10,
       "plan_reference": "Cookie-based SSO Plan - Phase 1",
       "acceptance_criteria": [
@@ -521,7 +521,7 @@
       "id": "feat-022",
       "description": "SSO: Configure CORS for subdomains",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 10,
       "plan_reference": "Cookie-based SSO Plan - Phase 1",
       "acceptance_criteria": [

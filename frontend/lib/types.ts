@@ -183,3 +183,52 @@ export interface ToastProps {
   message: string;
   duration?: number;
 }
+
+// ===== SSO / Auth Types =====
+
+export interface SessionInfo {
+  session_id: number;
+  created_at: number;
+  last_active: number;
+  expires_at: number;
+  user_agent?: string;
+  ip_address?: string;
+}
+
+export interface ConnectedAppInfo {
+  app_name: string;
+  display_name: string;
+  first_accessed: number;
+  last_accessed: number;
+}
+
+export interface UserResponse {
+  wallet_address: string;
+  pda_address?: string;
+  owner_pubkey?: string;
+  created_at: number;
+}
+
+export interface LoginRequest {
+  wallet_address: string;
+  signature?: string;
+  email?: string;
+}
+
+export interface LoginResponse {
+  user: UserResponse;
+  session: SessionInfo;
+}
+
+export interface ValidateResponse {
+  valid: boolean;
+  user?: UserResponse;
+}
+
+export interface ConnectedAppsResponse {
+  apps: ConnectedAppInfo[];
+}
+
+export interface SessionsResponse {
+  sessions: SessionInfo[];
+}

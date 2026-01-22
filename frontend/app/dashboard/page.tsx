@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletInfo } from '@/components/wallet/WalletInfo';
 import { IdentityCard } from '@/components/identity/IdentityCard';
+import { ConnectedApps, ActiveSessions } from '@/components/sso';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -45,6 +46,13 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-2 gap-6">
           <WalletInfo />
           <IdentityCard />
+        </div>
+      )}
+
+      {connected && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <ConnectedApps />
+          <ActiveSessions />
         </div>
       )}
 

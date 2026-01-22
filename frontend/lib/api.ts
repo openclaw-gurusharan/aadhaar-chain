@@ -13,6 +13,14 @@ import type {
   UnsignedTransaction,
   TransactionReceipt,
   ApiResponse,
+  SessionInfo,
+  ConnectedAppInfo,
+  UserResponse,
+  LoginRequest,
+  LoginResponse,
+  ValidateResponse,
+  ConnectedAppsResponse,
+  SessionsResponse,
 } from './types';
 
 // API base URL from env or default
@@ -499,6 +507,159 @@ export const healthApi = {
   async check(): Promise<{ status: string; version: string }> {
     const { data } = await apiClient.get<{ status: string; version: string }>('/api/health');
     return data;
+  },
+};
+
+// ===== SSO / AUTH MODULE =====
+export const authApi = {
+  /**
+   * Login with wallet address and create SSO session
+   */
+  async login(request: LoginRequest): Promise<LoginResponse> {
+    const { data } = await apiClient.post<ApiResponse<LoginResponse>>(
+      '/api/auth/login',
+      request,
+      {
+        withCredentials: true, // Important for cookies
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Login failed');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Logout and revoke current session
+   */
+  async logout(): Promise<{ message: string }> {
+    const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
+      '/api/auth/logout',
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Logout failed');
+    }
+
+    toast.info('Logged out successfully');
+    return data.data;
+  },
+
+  /**
+   * Validate current session
+   */
+  async validate(): Promise<ValidateResponse> {
+    const { data } = await apiClient.get<ApiResponse<ValidateResponse>>(
+      '/api/auth/validate',
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Validation failed');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * Get current authenticated user
+   */
+  async getCurrentUser(): Promise<UserResponse> {
+    const { data } = await apiClient.get<ApiResponse<UserResponse>>(
+      '/api/auth/me',
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to get user');
+    }
+
+    return data.data;
+  },
+
+  /**
+   * List all active sessions for current user
+   */
+  async getSessions(): Promise<SessionInfo[]> {
+    const { data } = await apiClient.get<ApiResponse<SessionsResponse>>(
+      '/api/auth/sessions',
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to get sessions');
+    }
+
+    return data.data.sessions;
+  },
+
+  /**
+   * Revoke a specific session
+   */
+  async revokeSession(sessionId: number): Promise<{ message: string }> {
+    const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
+      `/api/auth/sessions/${sessionId}/revoke`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to revoke session');
+    }
+
+    toast.success('Session revoked');
+    return data.data;
+  },
+
+  /**
+   * List all connected apps for current user
+   */
+  async getConnectedApps(): Promise<ConnectedAppInfo[]> {
+    const { data } = await apiClient.get<ApiResponse<ConnectedAppsResponse>>(
+      '/api/auth/apps',
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to get apps');
+    }
+
+    return data.data.apps;
+  },
+
+  /**
+   * Record access to a connected app
+   */
+  async recordAppAccess(appName: string): Promise<{ message: string }> {
+    const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
+      `/api/auth/apps/${appName}/access`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (!data.success || !data.data) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'Failed to record access');
+    }
+
+    return data.data;
   },
 };
 
