@@ -163,9 +163,18 @@ async def validate(
 
     Called by child apps (FlatWatch, ONDC Buyer/Seller) to validate
     the SSO cookie and get user information.
+
+    Supports both cookie-based auth and Bearer token (for local development).
     """
     try:
+        # Try cookie first
         session_token = request.cookies.get(SESSION_COOKIE_NAME)
+
+        # Fallback to Bearer token (for cross-port local development)
+        if not session_token:
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                session_token = auth_header[7:]  # Remove "Bearer " prefix
 
         if not session_token:
             return ApiResponse(
