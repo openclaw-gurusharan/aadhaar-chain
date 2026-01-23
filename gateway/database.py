@@ -1,14 +1,22 @@
+import asyncio
+import logging
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from config import settings
 from db_base import Base
 
-# Create async engine
+logger = logging.getLogger(__name__)
+
+# Create async engine with increased timeout for Render
 engine = create_async_engine(
     settings.database_url,
     echo=False,
     pool_pre_ping=True,
     pool_size=5,
     max_overflow=10,
+    connect_args={
+        "timeout": 30,
+        "command_timeout": 30,
+    } if "asyncpg" in settings.database_url else {},
 )
 
 # Create async session factory
@@ -25,17 +33,11 @@ async def get_db():
         yield session
 
 
-import asyncio
-import logging
-
-logger = logging.getLogger(__name__)
-
-
-async def init_db(max_retries: int = 5, base_delay: float = 2.0):
+async def init_db(max_retries: int = 15, base_delay: float = 2.0):
     """Initialize database: create all tables with retry logic
 
     Args:
-        max_retries: Maximum number of connection attempts
+        max_retries: Maximum number of connection attempts (increased for Render)
         base_delay: Base delay in seconds (exponential backoff)
     """
     retry_count = 0
