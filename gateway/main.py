@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
 
     # Initialize database with retry logic for Render
     try:
-        await init_db(max_retries=5, base_delay=2.0)
+        await init_db()  # Uses default 15 retries, 2s base delay
         print("Database initialized successfully")
     except Exception as e:
         print(f"Database initialization failed: {e}")
