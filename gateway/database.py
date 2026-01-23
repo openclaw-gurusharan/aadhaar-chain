@@ -25,10 +25,41 @@ async def get_db():
         yield session
 
 
-async def init_db():
-    """Initialize database: create all tables"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+async def init_db(max_retries: int = 5, base_delay: float = 2.0):
+    """Initialize database: create all tables with retry logic
+
+    Args:
+        max_retries: Maximum number of connection attempts
+        base_delay: Base delay in seconds (exponential backoff)
+    """
+    retry_count = 0
+    delay = base_delay
+
+    while retry_count < max_retries:
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("Database initialized successfully")
+            return
+        except Exception as e:
+            retry_count += 1
+            if retry_count >= max_retries:
+                logger.error(f"Database initialization failed after {max_retries} attempts: {e}")
+                raise
+
+            # Exponential backoff with jitter
+            current_delay = delay * (2 ** (retry_count - 1)) + (retry_count * 0.1)
+            logger.warning(
+                f"Database connection attempt {retry_count}/{max_retries} failed: {e}. "
+                f"Retrying in {current_delay:.1f}s..."
+            )
+            await asyncio.sleep(current_delay)
 
 
 async def close_db():

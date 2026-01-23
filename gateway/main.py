@@ -1,6 +1,13 @@
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 from config import settings
 from database import init_db, close_db
@@ -13,11 +20,10 @@ async def lifespan(app: FastAPI):
     print(f"Starting Identity & Asset Tokenization Gateway")
     print(f"Solana RPC: {settings.solana_rpc_url}")
     print(f"API Setu Environment: {settings.apisetu_env}")
-    print(f"Database URL: {settings.database_url}")
 
-    # Initialize database
+    # Initialize database with retry logic for Render
     try:
-        await init_db()
+        await init_db(max_retries=5, base_delay=2.0)
         print("Database initialized successfully")
     except Exception as e:
         print(f"Database initialization failed: {e}")
