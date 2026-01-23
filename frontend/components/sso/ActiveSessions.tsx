@@ -158,7 +158,7 @@ export function ActiveSessions() {
 
         <div className="pt-2 border-t">
           <p className="text-xs text-muted-foreground">
-            Sessions are valid for 30 days. Revoke any sessions you don't recognize.
+            Sessions are valid for 30 days. Revoke any sessions you don&apos;t recognize.
           </p>
         </div>
       </CardContent>
