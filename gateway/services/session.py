@@ -46,11 +46,15 @@ async def create_session(
 
 def set_session_cookie(response: Response, session_token: str) -> Response:
     """Set the SSO session cookie on the response."""
+    # For localhost, don't set domain (cookies don't work with .localhost)
+    # For production, use .aadharcha.in for wildcard subdomain support
+    cookie_domain = None if settings.cookie_domain == ".aadharcha.in" and "localhost" in str(settings.cors_origins) else settings.cookie_domain
+
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
         value=session_token,
-        domain=settings.cookie_domain,
-        secure=True,
+        domain=cookie_domain,
+        secure=False,  # Set to False for localhost (HTTP)
         httponly=True,
         samesite="lax",
         max_age=int(SESSION_DURATION.total_seconds()),
@@ -60,9 +64,12 @@ def set_session_cookie(response: Response, session_token: str) -> Response:
 
 def clear_session_cookie(response: Response) -> Response:
     """Clear the SSO session cookie."""
+    # For localhost, don't set domain (cookies don't work with .localhost)
+    cookie_domain = None if settings.cookie_domain == ".aadharcha.in" and "localhost" in str(settings.cors_origins) else settings.cookie_domain
+
     response.delete_cookie(
         key=SESSION_COOKIE_NAME,
-        domain=settings.cookie_domain,
+        domain=cookie_domain,
     )
     return response
 
