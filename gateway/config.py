@@ -46,9 +46,11 @@ class Settings(BaseSettings):
     mock_mode: bool = True
 
     # SSO / Session
+    # Set IS_LOCALHOST=true for local development, false for production
+    is_localhost: bool = True  # Single switch for local vs production
     session_secret: str = "change-this-in-production"
     session_duration_days: int = 30
-    cookie_domain: str = ".aadharcha.in"  # Production
+    cookie_domain: str = ".aadharcha.in"  # Production (ignored when is_localhost=true)
     sso_allowed_origins: list[str] = [
         "http://localhost:3000",  # identity-aadhar
         "http://localhost:3001",  # FlatWatch
