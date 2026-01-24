@@ -6,12 +6,6 @@
   NODE_VERSION = "20"
   NEXT_TELEMETRY_DISABLED = "1"
 
-# Redirect www to non-www to prevent redirect loops
-[[redirects]]
-  from = "https://www.aadharcha.in/*"
-  to = "https://aadharcha.in/:splat"
-  status = 301
-  force = true
 
 # Next.js image optimization
 [[redirects]]
