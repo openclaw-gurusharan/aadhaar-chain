@@ -8,14 +8,21 @@
       "command": "srt",
       "args": [
         "node",
-        "/Users/gurusharan/Documents/remote-claude/Research/cursor-harness-test/mcp/token-efficient-mcp/dist/index.js"
+        "/Users/gurusharan/Documents/remote-claude/Research/identity-aadhar/mcp/token-efficient-mcp/dist/index.js"
       ]
+    },
+    "render": {
+      "type": "http",
+      "url": "https://mcp.render.com/mcp",
+      "headers": {
+        "Authorization": "Bearer rnd_ZGAmwBNJ1CUACuTioAii7WGZGsIf"
+      }
     },
     "context-graph": {
       "command": "uv",
       "args": [
         "--directory",
-        "/Users/gurusharan/Documents/remote-claude/Research/cursor-harness-test/mcp/context-graph-mcp",
+        "/Users/gurusharan/Documents/remote-claude/Research/identity-aadhar/mcp/context-graph-mcp",
         "run",
         "python",
         "server.py"
@@ -27,13 +34,5 @@
     "netlify": {
       "command": "npx",
       "args": ["-y", "@netlify/mcp"]
-    },
-    "playwriter": {
-      "command": "npx",
-      "args": [
-        "-y","playwriter@latest"
-      ]
     }
-  }
-  
-  }
+  }}

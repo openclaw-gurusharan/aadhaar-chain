@@ -1,9 +1,5 @@
 # Quick Reference
 
-## Purpose
-
-Identity Agent Platform - Solana + Claude Agent SDK
-
 ## Commands
 
 | Task | Command |
@@ -39,15 +35,6 @@ After completing any manual workflow (restart servers, test flow, debug session)
 - Create/update script with deterministic exit codes
 - Reference in CLAUDE.md for future agents
 
-## State → Skill
-
-| State | Skill |
-|-------|-------|
-| INIT | initialization/ |
-| IMPLEMENT | implementation/ |
-| TEST | testing/ |
-| COMPLETE | context-graph/ |
-
 ## Config
 
 | File | Purpose |
@@ -56,11 +43,6 @@ After completing any manual workflow (restart servers, test flow, debug session)
 | `.claude/progress/state.json` | Current state |
 | `.claude/progress/feature-list.json` | Features |
 | `.mcp.json` | MCP servers |
-
-## MCP Tools
-
-**token-efficient**: `execute_code`, `process_csv`, `process_logs`
-**context-graph**: `context_store_trace`, `context_query_traces`
 
 ## Issue Resolution Workflow
 

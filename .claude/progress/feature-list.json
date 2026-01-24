@@ -536,7 +536,7 @@
       "id": "feat-023",
       "description": "SSO: Dashboard - Connected Apps and Active Sessions UI",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "phase": 11,
       "plan_reference": "Cookie-based SSO Plan - Phase 3",
       "acceptance_criteria": [

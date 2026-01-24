@@ -26,6 +26,9 @@ import type {
 // API base URL from env or default
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+// Auth endpoints use local proxy to avoid cross-domain cookie issues
+const AUTH_BASE_URL = typeof window !== 'undefined' ? '' : API_BASE_URL;
+
 // Retry configuration
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1000;
@@ -517,7 +520,7 @@ export const authApi = {
    */
   async login(request: LoginRequest): Promise<LoginResponse> {
     const { data } = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/api/auth/login',
+      `${AUTH_BASE_URL}/api/auth/login`,
       request,
       {
         withCredentials: true, // Important for cookies
@@ -536,7 +539,7 @@ export const authApi = {
    */
   async logout(): Promise<{ message: string }> {
     const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
-      '/api/auth/logout',
+      `${AUTH_BASE_URL}/api/auth/logout`,
       {},
       {
         withCredentials: true,
@@ -556,7 +559,7 @@ export const authApi = {
    */
   async validate(): Promise<ValidateResponse> {
     const { data } = await apiClient.get<ApiResponse<ValidateResponse>>(
-      '/api/auth/validate',
+      `${AUTH_BASE_URL}/api/auth/validate`,
       {
         withCredentials: true,
       }
@@ -574,7 +577,7 @@ export const authApi = {
    */
   async getCurrentUser(): Promise<UserResponse> {
     const { data } = await apiClient.get<ApiResponse<UserResponse>>(
-      '/api/auth/me',
+      `${AUTH_BASE_URL}/api/auth/me`,
       {
         withCredentials: true,
       }
@@ -592,7 +595,7 @@ export const authApi = {
    */
   async getSessions(): Promise<SessionInfo[]> {
     const { data } = await apiClient.get<ApiResponse<SessionsResponse>>(
-      '/api/auth/sessions',
+      `${AUTH_BASE_URL}/api/auth/sessions`,
       {
         withCredentials: true,
       }
@@ -610,7 +613,7 @@ export const authApi = {
    */
   async revokeSession(sessionId: number): Promise<{ message: string }> {
     const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
-      `/api/auth/sessions/${sessionId}/revoke`,
+      `${AUTH_BASE_URL}/api/auth/sessions/${sessionId}/revoke`,
       {},
       {
         withCredentials: true,
@@ -630,7 +633,7 @@ export const authApi = {
    */
   async getConnectedApps(): Promise<ConnectedAppInfo[]> {
     const { data } = await apiClient.get<ApiResponse<ConnectedAppsResponse>>(
-      '/api/auth/apps',
+      `${AUTH_BASE_URL}/api/auth/apps`,
       {
         withCredentials: true,
       }
@@ -648,7 +651,7 @@ export const authApi = {
    */
   async recordAppAccess(appName: string): Promise<{ message: string }> {
     const { data } = await apiClient.post<ApiResponse<{ message: string }>>(
-      `/api/auth/apps/${appName}/access`,
+      `${AUTH_BASE_URL}/api/auth/apps/${appName}/access`,
       {},
       {
         withCredentials: true,

@@ -33,10 +33,27 @@ check_infrastructure() {
     if ! pg_isready -h localhost -p 5432 >/dev/null 2>&1; then
       echo "✗ PostgreSQL not responding" >&2
       echo "" >&2
+
+      # Detect stale lock file (common macOS Homebrew issue)
+      local pg_data_dir=""
+      for dir in /opt/homebrew/var/postgresql@* /usr/local/var/postgresql@*; do
+        if [ -d "$dir" ]; then
+          local pg_version=$(basename "$dir" | sed 's/postgresql@//')
+          if pg_ctl -D "$dir" status >/dev/null 2>&1; then
+            if [ -f "$dir/postmaster.pid" ]; then
+              echo "✗ Stale postmaster.pid detected (process not actually running)" >&2
+              echo "Fix: rm -f $dir/postmaster.pid && brew services restart postgresql@$pg_version" >&2
+              ISSUES_FOUND=1
+              return
+            fi
+          fi
+        fi
+      done
+
       echo "Fix:" >&2
-      echo "  brew services start postgresql@15" >&2
+      echo "  brew services start postgresql@14" >&2
       echo "  OR" >&2
-      echo "  pg_ctl -D /opt/homebrew/var/postgresql@15 start" >&2
+      echo "  pg_ctl -D /opt/homebrew/var/postgresql@14 start" >&2
       ISSUES_FOUND=1
     else
       echo "✓ PostgreSQL is running"
