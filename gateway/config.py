@@ -54,9 +54,11 @@ class Settings(BaseSettings):
     sso_allowed_origins: list[str] = [
         "http://localhost:3000",  # identity-aadhar
         "http://localhost:3001",  # FlatWatch
-        "http://localhost:3002",  # ONDC Buyer
+        "http://localhost:3002",  # ONDC Buyer (alt)
         "http://localhost:3003",  # ONDC Seller
+        "http://localhost:3004",  # ONDC Buyer
         "https://aadharcha.in",
+        "https://www.aadharcha.in",
         "https://flatwatch.aadharcha.in",
         "https://ondcbuyer.aadharcha.in",
         "https://ondcseller.aadharcha.in",
