@@ -11,17 +11,16 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
       body: JSON.stringify(body),
     });
 
     const data = await response.json();
     const nextResponse = NextResponse.json(data, { status: response.status });
 
-    // Forward set-cookie headers (critical for session)
-    const setCookieHeader = response.headers.get('set-cookie');
-    if (setCookieHeader) {
-      nextResponse.headers.set('set-cookie', setCookieHeader);
+    // Forward ALL set-cookie headers from gateway (critical for session)
+    const setCookieHeaders = response.headers.getSetCookie();
+    for (const setCookie of setCookieHeaders) {
+      nextResponse.headers.append('set-cookie', setCookie);
     }
 
     return nextResponse;

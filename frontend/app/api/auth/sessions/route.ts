@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const SESSION_COOKIE = 'aadharcha_session';
 
 export async function GET(request: NextRequest) {
   try {
-    // Forward cookie from request to gateway
-    const cookies = request.cookies.getAll();
-    const cookieHeader = cookies
-      .map(c => `${c.name}=${c.value}`)
-      .join('; ');
+    // Get the session cookie specifically
+    const sessionCookie = request.cookies.get(SESSION_COOKIE);
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    // Only add cookie header if it exists
+    if (sessionCookie) {
+      headers['Cookie'] = `${SESSION_COOKIE}=${sessionCookie.value}`;
+    }
 
     const response = await fetch(`${GATEWAY_URL}/api/auth/sessions`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': cookieHeader,
-      },
-      credentials: 'include',
+      headers,
     });
 
     const data = await response.json();
@@ -24,9 +27,9 @@ export async function GET(request: NextRequest) {
     // Forward set-cookie headers from gateway response
     const nextResponse = NextResponse.json(data, { status: response.status });
 
-    const setCookieHeader = response.headers.get('set-cookie');
-    if (setCookieHeader) {
-      nextResponse.headers.set('set-cookie', setCookieHeader);
+    const setCookieHeaders = response.headers.getSetCookie();
+    for (const setCookie of setCookieHeaders) {
+      nextResponse.headers.append('set-cookie', setCookie);
     }
 
     return nextResponse;

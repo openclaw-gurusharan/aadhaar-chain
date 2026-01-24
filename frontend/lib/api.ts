@@ -104,6 +104,14 @@ apiClient.interceptors.response.use(
 
     const status = error.response?.status;
 
+    // Redirect to login on 401 (except for login page itself)
+    if (status === 401 && typeof window !== 'undefined') {
+      const currentPath = window.location.pathname;
+      if (currentPath !== '/login') {
+        window.location.href = `/login?return=${encodeURIComponent(currentPath)}`;
+      }
+    }
+
     // Check if error is retryable
     if (
       status &&
@@ -124,7 +132,7 @@ apiClient.interceptors.response.use(
       const data = error.response.data as ApiResponse<never>;
       const errorMessage = typeof data.error === 'string' ? data.error : data.error?.message || error.message;
 
-      // Show toast for user-facing errors
+      // Show toast for user-facing errors (401 redirects to login, no toast needed)
       if (status !== 401 && status !== 403) {
         toast.error(errorMessage);
       }
