@@ -52,11 +52,12 @@ class Settings(BaseSettings):
     session_duration_days: int = 30
     cookie_domain: str = ".aadharcha.in"  # Production (ignored when is_localhost=true)
     sso_allowed_origins: list[str] = [
-        "http://localhost:3000",  # identity-aadhar
-        "http://localhost:3001",  # FlatWatch
-        "http://localhost:3002",  # ONDC Buyer (alt)
-        "http://localhost:3003",  # ONDC Seller
-        "http://localhost:3004",  # ONDC Buyer
+        "http://localhost:3000",  # identity-aadhar (local dev only)
+        "http://localhost:3001",  # FlatWatch (local dev)
+        "http://localhost:3002",  # ONDC Buyer (local dev)
+        "http://localhost:3003",  # ONDC Seller (local dev)
+        "http://localhost:3004",  # ONDC Buyer (local dev)
+        # Production - HTTPS only (no http versions)
         "https://aadharcha.in",
         "https://www.aadharcha.in",
         "https://flatwatch.aadharcha.in",
