@@ -31,9 +31,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 // On server: use gateway URL directly
 const getAuthBaseUrl = () => {
   if (typeof window !== 'undefined') {
-    const origin = window.location.origin;
-    console.log('[Auth Proxy] Using origin:', origin, 'for auth requests');
-    return origin;
+    return window.location.origin;
   }
   return API_BASE_URL;
 };

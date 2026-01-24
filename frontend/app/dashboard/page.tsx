@@ -4,10 +4,15 @@ import { useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletInfo } from '@/components/wallet/WalletInfo';
 import { IdentityCard } from '@/components/identity/IdentityCard';
-import { ConnectedApps, ActiveSessions } from '@/components/sso';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+
+const APPS = [
+  { name: 'FlatWatch', url: 'https://flatwatch.aadharcha.in', icon: '🏠', description: 'Property rental platform' },
+  { name: 'ONDC Buyer', url: 'https://ondcbuyer.aadharcha.in', icon: '🛒', description: 'Buyer portal' },
+  { name: 'ONDC Seller', url: 'https://ondcseller.aadharcha.in', icon: '🏪', description: 'Seller portal' },
+];
 
 export default function DashboardPage() {
   const { connected } = useWallet();
@@ -50,10 +55,28 @@ export default function DashboardPage() {
       )}
 
       {connected && (
-        <div className="grid md:grid-cols-2 gap-6">
-          <ConnectedApps />
-          <ActiveSessions />
-        </div>
+        <Card className="metric-card">
+          <CardHeader>
+            <CardTitle>Apps</CardTitle>
+          </CardHeader>
+          <CardContent className="grid md:grid-cols-3 gap-4">
+            {APPS.map((app) => (
+              <a
+                key={app.name}
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group"
+              >
+                <Button variant="outline" className="w-full h-24 flex-col hover-lift">
+                  <span className="text-3xl mb-2">{app.icon}</span>
+                  <span className="font-medium">{app.name}</span>
+                  <span className="text-xs text-muted-foreground mt-1">{app.description}</span>
+                </Button>
+              </a>
+            ))}
+          </CardContent>
+        </Card>
       )}
 
       {connected && hasIdentity && (
