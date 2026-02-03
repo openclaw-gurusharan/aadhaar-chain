@@ -14,6 +14,7 @@ from app.models import (
     ApiResponse,
 )
 from app.routes import router as identity_router
+from app.agent_manager import agent_manager
 
 
 # Create FastAPI app
@@ -38,6 +39,17 @@ app.add_middleware(
 
 # Include identity router
 app.include_router(identity_router, prefix="/api")
+
+
+# Startup event: Initialize agents
+@app.on_event("startup")
+async def startup_event():
+    """Initialize Claude Agent SDK and agents on startup."""
+    # TODO: Initialize Claude Agent SDK
+    # TODO: Connect to MCP servers (document-processor, pattern-analyzer, compliance-rules)
+    # TODO: Load agent definitions from mcp/agents.py
+    # TODO: Initialize agent manager with configured agents
+    pass
 
 
 # Health check endpoint
