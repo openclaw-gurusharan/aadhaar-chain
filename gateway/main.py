@@ -5,6 +5,15 @@ from fastapi.responses import JSONResponse
 import uvicorn
 
 from config import settings
+from app.models import (
+    AadhaarVerificationData,
+    PanVerificationData,
+    VerificationStatus,
+    IdentityData,
+    VerificationStep,
+    ApiResponse,
+)
+from app.routes import router as identity_router
 
 
 # Create FastAPI app
@@ -25,6 +34,10 @@ app.add_middleware(
     allow_methods=settings.cors_allow_methods,
     allow_headers=settings.cors_allow_headers,
 )
+
+
+# Include identity router
+app.include_router(identity_router, prefix="/api")
 
 
 # Health check endpoint

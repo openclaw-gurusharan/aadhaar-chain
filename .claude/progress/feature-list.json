@@ -199,7 +199,7 @@
       "id": "feat-009",
       "description": "Pattern Analyzer and Compliance Rules MCP tools",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "detect_tampering tool (image hash, metadata checks)",
@@ -340,13 +340,13 @@
       "P1": 9
     },
     "by_status": {
-      "pending": 10,
+      "pending": 9,
       "in_progress": 0,
-      "completed": 12
+      "completed": 13
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
-      "5": "Backend + Agent SDK",
+      "5": "Backend + Agent SDK (in progress)",
       "6": "Solana Service Layer",
       "7": "Solana Programs",
       "8": "Integration"

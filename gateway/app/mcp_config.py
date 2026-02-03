@@ -87,6 +87,28 @@ DEFAULT_MCP_SERVERS = {
             "PYTORCH_CUDA_ALLOC_CONF": "max_split_size_mb:128",  # For Tesseract if needed
         },
     ),
+    "pattern-analyzer": MCPServerConfig(
+        name="pattern-analyzer",
+        command="uv",
+        args=[
+            "--directory",
+            "mcp-servers/pattern-analyzer",
+            "run",
+            "python",
+            "server.py"
+        ],
+    ),
+    "compliance-rules": MCPServerConfig(
+        name="compliance-rules",
+        command="uv",
+        args=[
+            "--directory",
+            "mcp-servers/compliance-rules",
+            "run",
+            "python",
+            "server.py"
+        ],
+    ),
 }
 
 # Default agent configurations
