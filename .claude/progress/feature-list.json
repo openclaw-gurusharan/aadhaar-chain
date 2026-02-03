@@ -170,7 +170,7 @@
       "id": "feat-007",
       "description": "Pydantic models for identity, verification, and credentials",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "Identity model matching frontend types",
@@ -342,7 +342,7 @@
     "by_status": {
       "pending": 9,
       "in_progress": 0,
-      "completed": 13
+      "completed": 15
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
