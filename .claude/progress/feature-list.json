@@ -213,7 +213,7 @@
       "id": "feat-010",
       "description": "Agent definitions for Document Validator, Fraud Detection, Compliance",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "AgentDefinition for document-validator with MCP tools",
@@ -342,7 +342,7 @@
     "by_status": {
       "pending": 9,
       "in_progress": 0,
-      "completed": 15
+      "completed": 16
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
