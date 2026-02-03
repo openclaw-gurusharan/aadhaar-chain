@@ -6,6 +6,10 @@ from app.models import (
     IdentityData,
     VerificationStatus,
     VerificationStep,
+    VerificationStepDetail,
+    StepStatus,
+    AadhaarVerificationData,
+    PanVerificationData,
     ApiResponse,
 )
 
@@ -28,20 +32,28 @@ async def create_aadhaar_verification(
 ):
     """Create Aadhaar card verification request."""
     verification_id = f"aadhaar_{wallet_address}"
-    
-    # Initialize verification status
+
+    # Initialize verification status with detailed steps
     status = VerificationStatus(
         verification_id=verification_id,
         wallet_address=wallet_address,
+        status="processing",
         current_step=VerificationStep.document_received,
-        steps=[VerificationStep.document_received],
+        steps=[
+            VerificationStepDetail(name="document_received", status=StepStatus.completed),
+            VerificationStepDetail(name="parsing", status=StepStatus.pending),
+            VerificationStepDetail(name="fraud_check", status=StepStatus.pending),
+            VerificationStepDetail(name="compliance_check", status=StepStatus.pending),
+            VerificationStepDetail(name="blockchain_upload", status=StepStatus.pending),
+            VerificationStepDetail(name="complete", status=StepStatus.pending),
+        ],
         progress=0.0,
         created_at=_get_timestamp(),
         updated_at=_get_timestamp(),
     )
-    
+
     verifications[verification_id] = status
-    
+
     return ApiResponse(
         success=True,
         message=f"Aadhaar verification created: {verification_id}",
@@ -59,20 +71,28 @@ async def create_pan_verification(
 ):
     """Create PAN card verification request."""
     verification_id = f"pan_{wallet_address}"
-    
-    # Initialize verification status
+
+    # Initialize verification status with detailed steps
     status = VerificationStatus(
         verification_id=verification_id,
         wallet_address=wallet_address,
+        status="processing",
         current_step=VerificationStep.document_received,
-        steps=[VerificationStep.document_received],
+        steps=[
+            VerificationStepDetail(name="document_received", status=StepStatus.completed),
+            VerificationStepDetail(name="parsing", status=StepStatus.pending),
+            VerificationStepDetail(name="fraud_check", status=StepStatus.pending),
+            VerificationStepDetail(name="compliance_check", status=StepStatus.pending),
+            VerificationStepDetail(name="blockchain_upload", status=StepStatus.pending),
+            VerificationStepDetail(name="complete", status=StepStatus.pending),
+        ],
         progress=0.0,
         created_at=_get_timestamp(),
         updated_at=_get_timestamp(),
     )
-    
+
     verifications[verification_id] = status
-    
+
     return ApiResponse(
         success=True,
         message=f"PAN verification created: {verification_id}",
@@ -90,7 +110,7 @@ async def get_verification_status(
     """Get verification status by ID."""
     if verification_id not in verifications:
         raise HTTPException(status_code=404, detail="Verification not found")
-    
+
     return ApiResponse(
         success=True,
         data=verifications[verification_id].model_dump()
@@ -108,13 +128,14 @@ async def get_identity(
     if wallet_address not in identities:
         # Create new identity if not exists
         identities[wallet_address] = IdentityData(
-            did=f"did:{wallet_address}",
-            wallet_address=wallet_address,
+            did=f"did:sol:{wallet_address}",
+            owner=wallet_address,
+            commitment="",  # Will be set on blockchain
             verification_bitmap=0,
             created_at=_get_timestamp(),
             updated_at=_get_timestamp(),
         )
-    
+
     return ApiResponse(
         success=True,
         data=identities[wallet_address].model_dump()
@@ -124,15 +145,15 @@ async def get_identity(
 @router.post("/{wallet_address}", response_model=ApiResponse, tags=["identity"])
 async def update_identity(
     wallet_address: str,
-    data: dict
+    data: dict,
 ):
     """Update identity data for wallet address."""
     if wallet_address not in identities:
         raise HTTPException(status_code=404, detail="Identity not found")
-    
+
     # Update identity (e.g., set verification bits)
     identities[wallet_address].updated_at = _get_timestamp()
-    
+
     return ApiResponse(
         success=True,
         message="Identity updated",
