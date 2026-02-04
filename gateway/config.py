@@ -1,6 +1,7 @@
 """Configuration management for aadhaar-chain gateway."""
 from pydantic_settings import BaseSettings
-from typing import Optional
+from pydantic import field_validator
+from typing import Optional, Union
 
 
 class Settings(BaseSettings):
@@ -14,8 +15,8 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
 
-    # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    # CORS (accept both comma-separated string and list)
+    cors_origins: Union[str, list[str]] = ["http://localhost:3000", "http://127.0.0.1:3000"]
     cors_allow_credentials: bool = True
     cors_allow_methods: list[str] = ["*"]
     cors_allow_headers: list[str] = ["*"]
@@ -32,9 +33,18 @@ class Settings(BaseSettings):
 
     # Anthropic (Claude Agent SDK)
     anthropic_api_key: Optional[str] = None
+    anthropic_base_url: Optional[str] = None
 
     # Storage
     data_dir: str = "./data"
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v):
+        """Parse CORS origins from comma-separated string or list."""
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
 
     class Config:
         env_file = ".env"
