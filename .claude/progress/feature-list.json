@@ -227,7 +227,7 @@
       "id": "feat-011",
       "description": "Orchestrator agent with verification workflow",
       "priority": "P0",
-      "status": "pending",
+      "status": "in_progress",
       "phase": 5,
       "acceptance_criteria": [
         "ClaudeAgentOptions with Task tool enabled",
