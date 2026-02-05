@@ -283,7 +283,7 @@
       "id": "feat-015",
       "description": "Solana service layer with solders/anchorpy",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "phase": 6,
       "acceptance_criteria": [
         "RPC client initialization",
@@ -340,14 +340,14 @@
       "P1": 9
     },
     "by_status": {
-      "pending": 6,
+      "pending": 5,
       "in_progress": 0,
-      "completed": 19
+      "completed": 20
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
       "5": "Backend + Agent SDK (completed)",
-      "6": "Solana Service Layer (pending)",
+      "6": "Solana Service Layer (completed)",
       "7": "Solana Programs (pending)",
       "8": "Integration (pending)"
     }

@@ -14,6 +14,7 @@ from app.models import (
     Credential,
     CredentialRequest,
 )
+from app.solana_service import solana_service
 
 from app.agent_manager import agent_manager
 
@@ -246,18 +247,51 @@ async def prepare_transaction(
     data: dict,
 ):
     """Prepare transaction for identity/asset operations (unsigned)."""
-    # Mock transaction preparation
-    # In production, this would call Solana service layer
-    transaction_id = f"txn_{wallet_address[:8]}_{_get_timestamp()}"
+    transaction_type = data.get("transaction_type")
+
+    # Prepare transaction based on type using Solana service
+    prepared_tx = None
+
+    if transaction_type == "identity_create":
+        prepared_tx = await solana_service.prepare_create_identity_transaction(
+            wallet_address=wallet_address,
+            commitment=data.get("commitment", ""),
+        )
+    elif transaction_type == "identity_update":
+        prepared_tx = await solana_service.prepare_update_commitment_transaction(
+            wallet_address=wallet_address,
+            new_commitment=data.get("commitment", ""),
+        )
+    elif transaction_type == "set_verification_bit":
+        prepared_tx = await solana_service.prepare_set_verification_bit_transaction(
+            wallet_address=wallet_address,
+            bit_index=data.get("bit_index", 0),
+        )
+    elif transaction_type == "credential_issue":
+        prepared_tx = await solana_service.prepare_issue_credential_transaction(
+            wallet_address=wallet_address,
+            credential_type=data.get("credential_type", ""),
+            claims=data.get("claims", {}),
+        )
+    elif transaction_type == "credential_revoke":
+        prepared_tx = await solana_service.prepare_revoke_credential_transaction(
+            wallet_address=wallet_address,
+            credential_id=data.get("credential_id", ""),
+        )
+    else:
+        raise HTTPException(status_code=400, detail=f"Unknown transaction type: {transaction_type}")
+
+    transaction_id = f"txn_{wallet_address[:8]}_{int(time.time())}"
 
     transaction_data = {
         "transaction_id": transaction_id,
         "wallet_address": wallet_address,
-        "transaction_type": data.get("transaction_type"),
+        "transaction_type": transaction_type,
         "status": "pending",
         "created_at": _get_timestamp(),
-        # In production, this would include unsigned transaction bytes
-        "unsigned_tx": "unsigned_transaction_placeholder",
+        "unsigned_tx": prepared_tx.transaction_bytes.hex() if prepared_tx else None,
+        "recent_blockhash": prepared_tx.recent_blockhash if prepared_tx else None,
+        "fee_payer": prepared_tx.fee_payer if prepared_tx else wallet_address,
     }
 
     return ApiResponse(
@@ -274,30 +308,41 @@ async def submit_transaction(
 ):
     """Submit signed transaction to Solana network."""
     signature = data.get("signature")
+    unsigned_tx = data.get("unsigned_tx")
+
     if not signature:
         raise HTTPException(status_code=400, detail="Signature required")
 
-    # Mock transaction submission
-    # In production, this would call Solana service layer to submit signed transaction
-    transaction_data = {
-        "transaction_id": f"txn_{wallet_address[:8]}_{_get_timestamp()}",
-        "wallet_address": wallet_address,
-        "transaction_type": data.get("transaction_type"),
-        "signature": signature,
-        "status": "confirmed",  # Mock status
-        "created_at": _get_timestamp(),
-    }
+    # Submit signed transaction via Solana service
+    try:
+        # Decode unsigned_tx from hex if provided
+        tx_bytes = bytes.fromhex(unsigned_tx) if unsigned_tx else None
 
-    # Update identity if transaction is for identity update
-    if data.get("transaction_type") == "identity_update":
-        if wallet_address in identities:
-            identities[wallet_address].updated_at = _get_timestamp()
+        # Submit transaction (mock for now, will call actual service)
+        submitted_signature = await solana_service.submit_transaction(tx_bytes)
 
-    return ApiResponse(
-        success=True,
-        message="Transaction submitted",
-        data=transaction_data
-    )
+        transaction_data = {
+            "transaction_id": f"txn_{wallet_address[:8]}_{int(time.time())}",
+            "wallet_address": wallet_address,
+            "transaction_type": data.get("transaction_type"),
+            "signature": submitted_signature,
+            "status": "confirmed",
+            "created_at": _get_timestamp(),
+        }
+
+        # Update identity if transaction is for identity update
+        if data.get("transaction_type") in ["identity_create", "identity_update"]:
+            if wallet_address in identities:
+                identities[wallet_address].updated_at = _get_timestamp()
+
+        return ApiResponse(
+            success=True,
+            message="Transaction submitted",
+            data=transaction_data
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Transaction submission failed: {str(e)}")
 
 
 # --- Credentials Routes ---

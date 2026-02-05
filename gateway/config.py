@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     # Solana
     solana_rpc_url: str = "http://127.0.0.1:8899"
+    solana_ws_url: Optional[str] = "ws://127.0.0.1:8900"
 
     # IPFS
     ipfs_gateway_url: str = "https://ipfs.io/ipfs"
