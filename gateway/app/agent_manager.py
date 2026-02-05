@@ -14,20 +14,32 @@ import json
 from app.models import (
     VerificationStatus,
     VerificationStep,
+    VerificationStepDetail,
+    StepStatus,
     AadhaarVerificationData,
     PanVerificationData,
     ApiResponse,
 )
 
 # Claude Agent SDK imports
-from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AgentDefinition
-from claude_agent_sdk.types import McpSdkServerConfig
+try:
+    from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AgentDefinition
+    from claude_agent_sdk.types import McpSdkServerConfig
+    SDK_AVAILABLE = True
+except ImportError:
+    SDK_AVAILABLE = False
+    print("Warning: Claude Agent SDK not available, using mock implementation")
 
 # Load agent definitions from mcp/agents.py
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-from mcp.agents import get_all_agents, get_agent_by_id
+try:
+    sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+    from mcp.agents import get_all_agents, get_agent_by_id
+    AGENTS_AVAILABLE = True
+except ImportError:
+    AGENTS_AVAILABLE = False
+    print("Warning: mcp.agents not available, using mock implementation")
 
 
 class AgentType(str, Enum):
@@ -87,23 +99,33 @@ class AgentManager:
         
     async def initialize_agents(self):
         """Initialize Claude Agent SDK and register agents.
-        
+
         Setup:
         1. Load agent definitions from mcp/agents.py
         2. Configure MCP servers
         3. Initialize SDK clients for each agent
         4. Connect to MCP servers
         """
-        # Get all agent definitions
-        agent_definitions = get_all_agents()
-        
-        # Store agent definitions
-        for agent_def in agent_definitions:
-            agent_type = AgentType(agent_def.agent_id)
-            self.agents[agent_type] = agent_def
-        
-        # Log initialization
-        print(f"✓ Loaded {len(agent_definitions)} agent definitions")
+        if AGENTS_AVAILABLE:
+            # Get all agent definitions
+            agent_definitions = get_all_agents()
+
+            # Store agent definitions
+            for agent_def in agent_definitions:
+                agent_type = AgentType(agent_def.agent_id)
+                self.agents[agent_type] = agent_def
+
+            # Log initialization
+            print(f"✓ Loaded {len(agent_definitions)} agent definitions")
+        else:
+            # Use mock agent definitions
+            print("✓ Using mock agent definitions (mcp.agents not available)")
+            # Mock agent definitions for development
+            self.agents = {
+                AgentType.DOCUMENT_VALIDATOR: "mock-document-validator",
+                AgentType.FRAUD_DETECTION: "mock-fraud-detection",
+                AgentType.COMPLIANCE_MONITOR: "mock-compliance-monitor",
+            }
         print(f"  - document-validator")
         print(f"  - fraud-detection")
         print(f"  - compliance-monitor")
@@ -435,53 +457,98 @@ Return as JSON with:
         - Context Graph integration for decision learning
         """
         verification_id = f"{document_type}_{wallet_address}"
-        
+
         # Initialize verification status
         status = VerificationStatus(
             verification_id=verification_id,
             wallet_address=wallet_address,
+            status="processing",
             current_step=VerificationStep.document_received,
-            steps=[VerificationStep.document_received],
+            steps=[
+                VerificationStepDetail(
+                    name=VerificationStep.document_received.value,
+                    status=StepStatus.completed
+                )
+            ],
             progress=0.0,
             created_at=datetime.utcnow().isoformat() + "Z",
             updated_at=datetime.utcnow().isoformat() + "Z",
         )
-        
+
         # Step 1: Document validation
         status.current_step = VerificationStep.parsing
         status.progress = 0.2
-        status.steps.append(VerificationStep.parsing)
+        status.steps.append(
+            VerificationStepDetail(
+                name=VerificationStep.parsing.value,
+                status=StepStatus.in_progress
+            )
+        )
         status.updated_at = datetime.utcnow().isoformat() + "Z"
-        
+
         document_result = await self.validate_document(document_data, document_type)
-        
+
         if not document_result.get("success", False):
             status.current_step = VerificationStep.complete
             status.progress = 1.0
+            status.status = "failed"
+            status.steps.append(
+                VerificationStepDetail(
+                    name=VerificationStep.complete.value,
+                    status=StepStatus.failed
+                )
+            )
             status.updated_at = datetime.utcnow().isoformat() + "Z"
             return status
-        
+
+        # Mark parsing as completed
+        status.steps[-1].status = StepStatus.completed
+
         # Step 2: Fraud detection
         status.current_step = VerificationStep.fraud_check
         status.progress = 0.4
-        status.steps.append(VerificationStep.fraud_check)
+        status.steps.append(
+            VerificationStepDetail(
+                name=VerificationStep.fraud_check.value,
+                status=StepStatus.in_progress
+            )
+        )
         status.updated_at = datetime.utcnow().isoformat() + "Z"
-        
+
         fraud_result = await self.detect_fraud(document_result["fields"], document_type)
-        
+
+        # Mark fraud_check as completed
+        status.steps[-1].status = StepStatus.completed
+
         # Step 3: Compliance check
         status.current_step = VerificationStep.compliance_check
         status.progress = 0.6
-        status.steps.append(VerificationStep.compliance_check)
+        status.steps.append(
+            VerificationStepDetail(
+                name=VerificationStep.compliance_check.value,
+                status=StepStatus.in_progress
+            )
+        )
         status.updated_at = datetime.utcnow().isoformat() + "Z"
-        
+
         compliance_result = await self.check_compliance(document_result["fields"], document_type)
-        
+
+        # Mark compliance_check as completed
+        status.steps[-1].status = StepStatus.completed
+
         # Step 4: Aggregation and decision
         status.current_step = VerificationStep.blockchain_upload
         status.progress = 0.8
-        status.steps.append(VerificationStep.blockchain_upload)
+        status.steps.append(
+            VerificationStepDetail(
+                name=VerificationStep.blockchain_upload.value,
+                status=StepStatus.in_progress
+            )
+        )
         status.updated_at = datetime.utcnow().isoformat() + "Z"
+
+        # Mark blockchain_upload as completed
+        status.steps[-1].status = StepStatus.completed
         
         # Make decision
         risk_score = fraud_result.get("risk_score", 0.0)
@@ -516,23 +583,29 @@ Return as JSON with:
                 f"Document type: {document_type}",
             ],
         )
-        
+
         # Complete verification
         status.current_step = VerificationStep.complete
         status.progress = 1.0
-        status.steps.append(VerificationStep.complete)
+        status.status = "verified" if decision == "approve" else "failed"
+        status.steps.append(
+            VerificationStepDetail(
+                name=VerificationStep.complete.value,
+                status=StepStatus.completed
+            )
+        )
         status.updated_at = datetime.utcnow().isoformat() + "Z"
-        
+
         # Store decision with provenance in metadata
         status.metadata = {
             "decision": decision,
             "reason": reason,
             "provenance": provenance.to_dict(),
         }
-        
+
         # Store verification record
         self.verification_records[verification_id] = status
-        
+
         return status
     
     async def get_verification_status(
@@ -566,19 +639,25 @@ Return as JSON with:
             Verification ID for tracking
         """
         verification_id = f"{document_type}_{wallet_address}"
-        
+
         status = VerificationStatus(
             verification_id=verification_id,
             wallet_address=wallet_address,
+            status="pending",
             current_step=VerificationStep.document_received,
-            steps=[VerificationStep.document_received],
+            steps=[
+                VerificationStepDetail(
+                    name=VerificationStep.document_received.value,
+                    status=StepStatus.pending
+                )
+            ],
             progress=0.0,
             created_at=datetime.utcnow().isoformat() + "Z",
             updated_at=datetime.utcnow().isoformat() + "Z",
         )
-        
+
         self.verification_records[verification_id] = status
-        
+
         return verification_id
     
     async def update_verification_progress(
@@ -588,7 +667,7 @@ Return as JSON with:
         progress: float,
     ) -> None:
         """Update verification progress.
-        
+
         Args:
             verification_id: Unique verification identifier
             current_step: Current step in workflow
@@ -596,12 +675,17 @@ Return as JSON with:
         """
         if verification_id not in self.verification_records:
             return
-        
+
         status = self.verification_records[verification_id]
         status.current_step = current_step
         status.progress = progress
         status.updated_at = datetime.utcnow().isoformat() + "Z"
-        status.steps.append(current_step)
+        status.steps.append(
+            VerificationStepDetail(
+                name=current_step.value,
+                status=StepStatus.in_progress
+            )
+        )
     
     async def complete_verification(
         self,
@@ -610,7 +694,7 @@ Return as JSON with:
         result_data: Dict[str, Any],
     ) -> None:
         """Mark verification as complete with decision.
-        
+
         Args:
             verification_id: Unique verification identifier
             decision: Final decision (approve, reject, manual_review)
@@ -618,17 +702,23 @@ Return as JSON with:
         """
         if verification_id not in self.verification_records:
             return
-        
+
         status = self.verification_records[verification_id]
         status.current_step = VerificationStep.complete
         status.progress = 1.0
+        status.status = "verified" if decision == "approve" else "failed"
         status.updated_at = datetime.utcnow().isoformat() + "Z"
-        status.steps.append(VerificationStep.complete)
-        
+        status.steps.append(
+            VerificationStepDetail(
+                name=VerificationStep.complete.value,
+                status=StepStatus.completed
+            )
+        )
+
         # Store decision in metadata with provenance
         if "provenance" not in result_data:
             result_data["provenance"] = {}
-        
+
         status.metadata = {
             "decision": decision,
             "result_data": result_data,

@@ -60,6 +60,7 @@ class VerificationStatus(BaseModel):
     created_at: str
     updated_at: str
     error: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
 
 
 # --- Identity Models ---

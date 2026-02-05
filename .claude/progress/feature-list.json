@@ -241,7 +241,7 @@
       "id": "feat-012",
       "description": "Verification routes with status tracking",
       "priority": "P0",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "POST /{walletAddress}/aadhaar endpoint",
@@ -255,7 +255,7 @@
       "id": "feat-013",
       "description": "Identity and Transaction routes",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "GET /api/identity/{walletAddress}",
@@ -269,7 +269,7 @@
       "id": "feat-014",
       "description": "Credentials routes for issuance and revocation",
       "priority": "P1",
-      "status": "pending",
+      "status": "completed",
       "phase": 5,
       "acceptance_criteria": [
         "GET /api/credentials/{walletAddress}",
@@ -340,16 +340,16 @@
       "P1": 9
     },
     "by_status": {
-      "pending": 9,
+      "pending": 6,
       "in_progress": 0,
-      "completed": 16
+      "completed": 19
     },
     "by_phase": {
       "1-4": "Frontend (completed)",
-      "5": "Backend + Agent SDK (in progress)",
-      "6": "Solana Service Layer",
-      "7": "Solana Programs",
-      "8": "Integration"
+      "5": "Backend + Agent SDK (completed)",
+      "6": "Solana Service Layer (pending)",
+      "7": "Solana Programs (pending)",
+      "8": "Integration (pending)"
     }
   }
 }
