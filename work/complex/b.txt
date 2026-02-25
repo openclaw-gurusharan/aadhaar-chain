@@ -1,0 +1,5 @@
+This is file B.
+Different content here.
+Another line.
+Yet another line.
+Last line of file B.

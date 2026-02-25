@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "name": "a.txt",
+      "lines": 4
+    },
+    {
+      "name": "b.txt",
+      "lines": 4
+    }
+  ]
+}
