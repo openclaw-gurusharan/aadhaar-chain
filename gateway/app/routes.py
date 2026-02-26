@@ -1,6 +1,9 @@
 """Routes for identity operations with agent integration."""
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from typing import Optional
+from datetime import datetime, timedelta
+from pydantic import BaseModel
+import jwt
 
 from app.models import (
     IdentityData,
@@ -9,17 +12,26 @@ from app.models import (
     AadhaarVerificationData,
     PanVerificationData,
     ApiResponse,
+    SSOUser,
+    SessionValidationResponse,
 )
 
 from app.agent_manager import agent_manager
+from gateway.config import settings
 
 
 # In-memory stores (for development)
 verifications: dict[str, VerificationStatus] = {}
 identities: dict[str, IdentityData] = {}
 
+# In-memory session store (for development)
+sessions: dict[str, dict] = {}
+
 
 router = APIRouter(prefix="/api/identity", tags=["identity"])
+
+# Auth router
+auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 # --- Verification Routes with Agent Integration ---
@@ -211,3 +223,110 @@ def _get_timestamp() -> str:
     """Get current timestamp in ISO format."""
     from datetime import datetime
     return datetime.utcnow().isoformat() + "Z"
+
+
+# --- SSO Auth Routes ---
+
+
+class LoginRequest(BaseModel):
+    """Login request model."""
+    wallet_address: str
+    email: Optional[str] = None
+
+
+class LoginResponse(BaseModel):
+    """Login response model."""
+    access_token: str
+    token_type: str = "bearer"
+    user: SSOUser
+
+
+@auth_router.post("/login", response_model=LoginResponse, tags=["auth"])
+async def login(request: LoginRequest):
+    """POST /api/auth/login - Authenticate user and create session."""
+    user = SSOUser(
+        user_id=f"user_{request.wallet_address[:8]}",
+        wallet_address=request.wallet_address,
+        email=request.email,
+        created_at=_get_timestamp(),
+        last_login=_get_timestamp(),
+    )
+    
+    payload = {
+        "user_id": user.user_id,
+        "wallet_address": user.wallet_address,
+        "exp": datetime.utcnow() + timedelta(days=7),
+    }
+    token = jwt.encode(payload, settings.jwt_secret, algorithm="HS256")
+    
+    sessions[token] = {
+        "user": user.model_dump(),
+        "expires_at": payload["exp"].isoformat() + "Z",
+    }
+    
+    return LoginResponse(
+        access_token=token,
+        user=user,
+    )
+
+
+@auth_router.get("/validate", response_model=SessionValidationResponse, tags=["auth"])
+async def validate_session(authorization: Optional[str] = Header(None)):
+    """GET /api/auth/validate - Validate session token."""
+    if not authorization or not authorization.startswith("Bearer "):
+        return SessionValidationResponse(
+            valid=False,
+            error="Missing or invalid authorization header",
+        )
+    
+    token = authorization.replace("Bearer ", "")
+    
+    if token not in sessions:
+        return SessionValidationResponse(
+            valid=False,
+            error="Invalid or expired session",
+        )
+    
+    session_data = sessions[token]
+    user = SSOUser(**session_data["user"])
+    
+    return SessionValidationResponse(
+        valid=True,
+        user=user,
+        expires_at=session_data["expires_at"],
+    )
+
+
+@auth_router.get("/me", response_model=ApiResponse, tags=["auth"])
+async def get_current_user(authorization: Optional[str] = Header(None)):
+    """Get current authenticated user."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = authorization.replace("Bearer ", "")
+    
+    if token not in sessions:
+        raise HTTPException(status_code=401, detail="Invalid or expired session")
+    
+    session_data = sessions[token]
+    user = SSOUser(**session_data["user"])
+    
+    return ApiResponse(
+        success=True,
+        message="User retrieved",
+        data=user.model_dump(),
+    )
+
+
+@auth_router.post("/logout", response_model=ApiResponse, tags=["auth"])
+async def logout(authorization: Optional[str] = Header(None)):
+    """Logout and invalidate session."""
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.replace("Bearer ", "")
+        if token in sessions:
+            del sessions[token]
+    
+    return ApiResponse(
+        success=True,
+        message="Logged out successfully",
+    )

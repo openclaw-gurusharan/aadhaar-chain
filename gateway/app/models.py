@@ -204,3 +204,23 @@ class StatusUpdate(BaseModel):
     status: Literal["pending", "processing", "verified", "failed"]
     progress: Optional[float] = Field(None, ge=0.0, le=1.0)
     error: Optional[str] = None
+
+
+# --- SSO Auth Models ---
+
+
+class SSOUser(BaseModel):
+    """SSO user model."""
+    user_id: str
+    wallet_address: str
+    email: Optional[str] = None
+    created_at: str
+    last_login: Optional[str] = None
+
+
+class SessionValidationResponse(BaseModel):
+    """Session validation response."""
+    valid: bool
+    user: Optional[SSOUser] = None
+    expires_at: Optional[str] = None
+    error: Optional[str] = None

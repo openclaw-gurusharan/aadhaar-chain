@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     # Storage
     data_dir: str = "./data"
 
+    # JWT
+    # JWT_SECRET env var maps to jwt_secret
+    jwt_secret: str = "dev-secret-change-in-production"
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def parse_cors_origins(cls, v):
