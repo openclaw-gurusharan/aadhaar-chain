@@ -26,7 +26,7 @@ from claude_agent_sdk.types import McpSdkServerConfig
 # Load agent definitions from mcp/agents.py
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 from mcp.agents import get_all_agents, get_agent_by_id
 
 

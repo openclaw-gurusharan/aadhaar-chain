@@ -14,6 +14,8 @@ from app.models import (
     ApiResponse,
 )
 from app.routes import router as identity_router
+from app.gateway_routes import router as gateway_router
+from app.rate_limiter import RateLimitMiddleware
 from app.agent_manager import agent_manager
 
 
@@ -25,6 +27,10 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc",
 )
+
+
+# Add rate limiting middleware
+app.add_middleware(RateLimitMiddleware)
 
 
 # Configure CORS
@@ -39,6 +45,9 @@ app.add_middleware(
 
 # Include identity router (no prefix, router already has prefix)
 app.include_router(identity_router)
+
+# Include gateway router
+app.include_router(gateway_router)
 
 
 # Startup event: Initialize agents
