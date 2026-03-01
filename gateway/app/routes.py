@@ -4,6 +4,8 @@ from typing import Optional
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 import jwt
+import secrets
+import hashlib
 
 from app.models import (
     IdentityData,
@@ -14,6 +16,14 @@ from app.models import (
     ApiResponse,
     SSOUser,
     SessionValidationResponse,
+    TokenResponse,
+    RefreshTokenRequest,
+    ExternalTokenValidationRequest,
+    ExternalTokenValidationResponse,
+    UserRole,
+    RoleAssignment,
+    RoleAssignmentRequest,
+    UserRolesResponse,
 )
 
 from app.agent_manager import agent_manager
@@ -26,6 +36,12 @@ identities: dict[str, IdentityData] = {}
 
 # In-memory session store (for development)
 sessions: dict[str, dict] = {}
+
+# Refresh tokens store (token_hash -> {user_id, wallet_address, expires_at, rotated})
+refresh_tokens: dict[str, dict] = {}
+
+# User roles store (user_id -> list of RoleAssignment)
+user_roles: dict[str, list[RoleAssignment]] = {}
 
 
 router = APIRouter(prefix="/api/identity", tags=["identity"])
@@ -232,18 +248,62 @@ class LoginRequest(BaseModel):
     """Login request model."""
     wallet_address: str
     email: Optional[str] = None
+    role: Optional[UserRole] = None
+    platform: Optional[str] = "ondc_buyer"
 
 
 class LoginResponse(BaseModel):
     """Login response model."""
     access_token: str
+    refresh_token: str
     token_type: str = "bearer"
     user: SSOUser
 
 
+def _generate_tokens(user: SSOUser, role: Optional[UserRole] = None, platform: Optional[str] = None) -> tuple[str, str]:
+    """Generate access and refresh tokens with configurable audience/issuer."""
+    now = datetime.utcnow()
+    
+    access_payload = {
+        "sub": user.user_id,
+        "wallet_address": user.wallet_address,
+        "role": role.value if role else None,
+        "platform": platform,
+        "exp": now + timedelta(minutes=settings.access_token_expire_minutes),
+        "iat": now,
+        "iss": settings.jwt_issuer,
+        "aud": settings.jwt_audience,
+        "type": "access",
+    }
+    
+    access_token = jwt.encode(access_payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    
+    refresh_payload = {
+        "sub": user.user_id,
+        "wallet_address": user.wallet_address,
+        "exp": now + timedelta(days=settings.refresh_token_expire_days),
+        "iat": now,
+        "iss": settings.jwt_issuer,
+        "aud": settings.jwt_audience,
+        "type": "refresh",
+    }
+    
+    refresh_token = jwt.encode(refresh_payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    
+    refresh_token_hash = hashlib.sha256(refresh_token.encode()).hexdigest()
+    refresh_tokens[refresh_token_hash] = {
+        "user_id": user.user_id,
+        "wallet_address": user.wallet_address,
+        "expires_at": refresh_payload["exp"].isoformat() + "Z",
+        "rotated": False,
+    }
+    
+    return access_token, refresh_token
+
+
 @auth_router.post("/login", response_model=LoginResponse, tags=["auth"])
 async def login(request: LoginRequest):
-    """POST /api/auth/login - Authenticate user and create session."""
+    """POST /api/auth/login - Authenticate user and create session with JWT."""
     user = SSOUser(
         user_id=f"user_{request.wallet_address[:8]}",
         wallet_address=request.wallet_address,
@@ -252,20 +312,18 @@ async def login(request: LoginRequest):
         last_login=_get_timestamp(),
     )
     
-    payload = {
-        "user_id": user.user_id,
-        "wallet_address": user.wallet_address,
-        "exp": datetime.utcnow() + timedelta(days=7),
-    }
-    token = jwt.encode(payload, settings.jwt_secret, algorithm="HS256")
+    access_token, refresh_token = _generate_tokens(user, request.role, request.platform)
     
-    sessions[token] = {
+    sessions[access_token] = {
         "user": user.model_dump(),
-        "expires_at": payload["exp"].isoformat() + "Z",
+        "role": request.role.value if request.role else None,
+        "platform": request.platform,
+        "expires_at": (datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)).isoformat() + "Z",
     }
     
     return LoginResponse(
-        access_token=token,
+        access_token=access_token,
+        refresh_token=refresh_token,
         user=user,
     )
 
@@ -329,4 +387,186 @@ async def logout(authorization: Optional[str] = Header(None)):
     return ApiResponse(
         success=True,
         message="Logged out successfully",
+    )
+
+
+@auth_router.post("/refresh", response_model=TokenResponse, tags=["auth"])
+async def refresh_token(request: RefreshTokenRequest):
+    """POST /api/auth/refresh - Refresh access token with rotation."""
+    try:
+        payload = jwt.decode(
+            request.refresh_token,
+            settings.jwt_secret,
+            algorithms=[settings.jwt_algorithm],
+            audience=settings.jwt_audience,
+            issuer=settings.jwt_issuer,
+        )
+        
+        if payload.get("type") != "refresh":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+        
+        refresh_token_hash = hashlib.sha256(request.refresh_token.encode()).hexdigest()
+        
+        if refresh_token_hash not in refresh_tokens:
+            raise HTTPException(status_code=401, detail="Refresh token not found")
+        
+        token_data = refresh_tokens[refresh_token_hash]
+        
+        if token_data.get("rotated"):
+            for hash_key, data in list(refresh_tokens.items()):
+                if data["user_id"] == token_data["user_id"] and data.get("rotated"):
+                    del refresh_tokens[hash_key]
+            raise HTTPException(status_code=401, detail="Refresh token already used")
+        
+        refresh_tokens[refresh_token_hash]["rotated"] = True
+        
+        user = SSOUser(
+            user_id=payload["sub"],
+            wallet_address=payload["wallet_address"],
+            created_at=_get_timestamp(),
+            last_login=_get_timestamp(),
+        )
+        
+        role = UserRole(payload["role"]) if payload.get("role") else None
+        platform = payload.get("platform")
+        
+        access_token, new_refresh_token = _generate_tokens(user, role, platform)
+        
+        sessions[access_token] = {
+            "user": user.model_dump(),
+            "role": role.value if role else None,
+            "platform": platform,
+            "expires_at": (datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)).isoformat() + "Z",
+        }
+        
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=new_refresh_token,
+            token_type="bearer",
+            expires_in=settings.access_token_expire_minutes * 60,
+        )
+        
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Refresh token expired")
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
+
+
+@auth_router.get("/validate-external", response_model=ExternalTokenValidationResponse, tags=["auth"])
+async def validate_external_token(
+    token: str,
+    platform: str = "external",
+    expected_issuer: Optional[str] = None,
+):
+    """GET /api/auth/validate-external - Validate cross-platform tokens."""
+    try:
+        expected_issuer = expected_issuer or settings.jwt_issuer
+        
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret,
+            algorithms=[settings.jwt_algorithm],
+            audience=[settings.jwt_audience, platform],
+            issuer=expected_issuer,
+        )
+        
+        return ExternalTokenValidationResponse(
+            valid=True,
+            user_id=payload.get("sub"),
+            wallet_address=payload.get("wallet_address"),
+            role=UserRole(payload["role"]) if payload.get("role") else None,
+            platform=payload.get("platform", platform),
+        )
+        
+    except jwt.ExpiredSignatureError:
+        return ExternalTokenValidationResponse(
+            valid=False,
+            error="Token expired",
+        )
+    except jwt.InvalidTokenError as e:
+        return ExternalTokenValidationResponse(
+            valid=False,
+            error=f"Invalid token: {str(e)}",
+        )
+
+
+@auth_router.post("/roles", response_model=ApiResponse, tags=["auth"])
+async def assign_role(request: RoleAssignmentRequest, authorization: Optional[str] = Header(None)):
+    """POST /api/auth/roles - Assign a role to a user."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = authorization.replace("Bearer ", "")
+    if token not in sessions:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    user_id = request.user_id
+    
+    if user_id not in user_roles:
+        user_roles[user_id] = []
+    
+    role_assignment = RoleAssignment(
+        user_id=user_id,
+        role=request.role,
+        platform=request.platform,
+        assigned_at=_get_timestamp(),
+        assigned_by=sessions[token]["user"]["user_id"],
+    )
+    
+    user_roles[user_id].append(role_assignment)
+    
+    return ApiResponse(
+        success=True,
+        message=f"Role {request.role.value} assigned to user {user_id}",
+        data=role_assignment.model_dump(),
+    )
+
+
+@auth_router.get("/roles/{user_id}", response_model=UserRolesResponse, tags=["auth"])
+async def get_user_roles(user_id: str, authorization: Optional[str] = Header(None)):
+    """GET /api/auth/roles/{user_id} - Get user's roles."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = authorization.replace("Bearer ", "")
+    if token not in sessions:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    wallet_address = sessions[token]["user"]["wallet_address"]
+    
+    roles = user_roles.get(user_id, [])
+    
+    return UserRolesResponse(
+        user_id=user_id,
+        wallet_address=wallet_address,
+        roles=roles,
+    )
+
+
+@auth_router.delete("/roles/{user_id}", response_model=ApiResponse, tags=["auth"])
+async def remove_role(
+    user_id: str,
+    role: UserRole,
+    platform: str = "ondc_buyer",
+    authorization: Optional[str] = Header(None),
+):
+    """DELETE /api/auth/roles/{user_id} - Remove a role from a user."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    token = authorization.replace("Bearer ", "")
+    if token not in sessions:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    if user_id not in user_roles:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_roles[user_id] = [
+        r for r in user_roles[user_id]
+        if not (r.role == role and r.platform == platform)
+    ]
+    
+    return ApiResponse(
+        success=True,
+        message=f"Role {role.value} removed from user {user_id}",
     )

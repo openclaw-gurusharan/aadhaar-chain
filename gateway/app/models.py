@@ -68,7 +68,7 @@ class VerificationStatus(BaseModel):
 class IdentityData(BaseModel):
     """Identity data on blockchain - matches frontend Identity interface."""
     did: str  # Decentralized Identifier
-    owner: str  # Wallet address that owns this identity
+    wallet_address: str  # Wallet address that owns this identity
     commitment: str  # Hash commitment on chain
     verification_bitmap: int = Field(default=0, ge=0)  # Bitmask of verified credential types
     created_at: str  # ISO timestamp
@@ -223,4 +223,83 @@ class SessionValidationResponse(BaseModel):
     valid: bool
     user: Optional[SSOUser] = None
     expires_at: Optional[str] = None
+    error: Optional[str] = None
+
+
+# --- Role Management Models ---
+
+
+class UserRole(str, Enum):
+    """User roles for OpenClaw platforms."""
+    buyer = "buyer"
+    seller = "seller"
+    society_member = "society_member"
+
+
+class RoleAssignment(BaseModel):
+    """Role assignment for a user."""
+    user_id: str
+    role: UserRole
+    platform: Literal["ondc_buyer", "ondc_seller", "flatwatch"] = "ondc_buyer"
+    assigned_at: str
+    assigned_by: Optional[str] = None
+
+
+class RoleAssignmentRequest(BaseModel):
+    """Request to assign a role."""
+    user_id: str
+    role: UserRole
+    platform: Literal["ondc_buyer", "ondc_seller", "flatwatch"] = "ondc_buyer"
+
+
+class UserRolesResponse(BaseModel):
+    """Response with user's roles."""
+    user_id: str
+    wallet_address: str
+    roles: List[RoleAssignment]
+
+
+# --- Token Models ---
+
+
+class TokenPayload(BaseModel):
+    """JWT token payload."""
+    sub: str  # user_id
+    wallet_address: str
+    role: Optional[UserRole] = None
+    platform: Optional[str] = None
+    exp: int
+    iat: int
+    iss: str
+    aud: str
+    type: Literal["access", "refresh"] = "access"
+
+
+class RefreshTokenRequest(BaseModel):
+    """Request to refresh access token."""
+    refresh_token: str
+
+
+class TokenResponse(BaseModel):
+    """Token response with access and refresh tokens."""
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int
+
+
+class ExternalTokenValidationRequest(BaseModel):
+    """Request to validate external platform token."""
+    token: str
+    platform: Literal["ondc_buyer", "ondc_seller", "flatwatch", "external"]
+    expected_issuer: Optional[str] = None
+
+
+class ExternalTokenValidationResponse(BaseModel):
+    """Response for external token validation."""
+    valid: bool
+    user_id: Optional[str] = None
+    wallet_address: Optional[str] = None
+    role: Optional[UserRole] = None
+    platform: Optional[str] = None
     error: Optional[str] = None
