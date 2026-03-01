@@ -20,14 +20,26 @@ from app.models import (
 )
 
 # Claude Agent SDK imports
-from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AgentDefinition
-from claude_agent_sdk.types import McpSdkServerConfig
+try:
+    from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, AgentDefinition
+    from claude_agent_sdk.types import McpSdkServerConfig
+    CLAUDE_SDK_AVAILABLE = True
+except ImportError:
+    CLAUDE_SDK_AVAILABLE = False
 
 # Load agent definitions from mcp/agents.py
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-from mcp.agents import get_all_agents, get_agent_by_id
+try:
+    from mcp.agents import get_all_agents, get_agent_by_id
+    MCP_AGENTS_AVAILABLE = True
+except ImportError:
+    def get_all_agents():
+        return []
+    def get_agent_by_id(agent_id: str):
+        return None
+    MCP_AGENTS_AVAILABLE = False
 
 
 class AgentType(str, Enum):

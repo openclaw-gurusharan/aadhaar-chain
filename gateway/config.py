@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     # JWT
     # JWT_SECRET env var maps to jwt_secret
     jwt_secret: str = "dev-secret-change-in-production"
+    jwt_algorithm: str = "HS256"
+    jwt_issuer: str = "aadhaar-chain"
+    jwt_audience: str = "openclaw-platforms"
+    access_token_expire_minutes: int = 15
+    refresh_token_expire_days: int = 7
 
     @field_validator("cors_origins", mode="before")
     @classmethod

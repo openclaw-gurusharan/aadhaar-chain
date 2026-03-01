@@ -24,6 +24,13 @@ from app.models import (
     RoleAssignment,
     RoleAssignmentRequest,
     UserRolesResponse,
+    UnifiedUserProfile,
+    CreateUserRequest,
+    UpdateUserRequest,
+    UpdateUserRolesRequest,
+    UserProfileResponse,
+    Platform,
+    KYCStatus,
 )
 
 from app.agent_manager import agent_manager
@@ -43,11 +50,20 @@ refresh_tokens: dict[str, dict] = {}
 # User roles store (user_id -> list of RoleAssignment)
 user_roles: dict[str, list[RoleAssignment]] = {}
 
+# Unified user profiles store (user_id -> UnifiedUserProfile)
+unified_users: dict[str, UnifiedUserProfile] = {}
+
+# User profiles by wallet address (wallet_address -> user_id)
+users_by_wallet: dict[str, str] = {}
+
 
 router = APIRouter(prefix="/api/identity", tags=["identity"])
 
 # Auth router
 auth_router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+# User profile router
+users_router = APIRouter(prefix="/api/users", tags=["users"])
 
 
 # --- Verification Routes with Agent Integration ---
@@ -570,3 +586,227 @@ async def remove_role(
         success=True,
         message=f"Role {role.value} removed from user {user_id}",
     )
+
+
+# --- Unified User Profile Routes ---
+
+
+@users_router.get("", response_model=ApiResponse, tags=["users"])
+async def list_users(
+    wallet_address: Optional[str] = None,
+    kyc_status: Optional[KYCStatus] = None,
+    platform: Optional[Platform] = None,
+):
+    """GET /api/users - List all users with optional filtering."""
+    users = list(unified_users.values())
+    
+    if wallet_address:
+        users = [u for u in users if u.wallet_address == wallet_address]
+    
+    if kyc_status:
+        users = [u for u in users if u.kyc_status == kyc_status]
+    
+    if platform:
+        users = [u for u in users if platform in u.platforms]
+    
+    return ApiResponse(
+        success=True,
+        message=f"Found {len(users)} users",
+        data={"users": [u.model_dump() for u in users], "count": len(users)},
+    )
+
+
+@users_router.post("", response_model=ApiResponse, tags=["users"])
+async def create_user(request: CreateUserRequest):
+    """POST /api/users - Create a new user profile."""
+    if request.wallet_address in users_by_wallet:
+        existing_user_id = users_by_wallet[request.wallet_address]
+        return ApiResponse(
+            success=False,
+            message="User already exists",
+            error={"code": "USER_EXISTS", "user_id": existing_user_id},
+        )
+    
+    user_id = f"user_{len(unified_users) + 1:06d}"
+    now = _get_timestamp()
+    
+    user = UnifiedUserProfile(
+        user_id=user_id,
+        wallet_address=request.wallet_address,
+        email=request.email,
+        phone=request.phone,
+        display_name=request.display_name,
+        roles=[],
+        platforms=[Platform.aadhaar_chain],
+        kyc_status=KYCStatus.unverified,
+        created_at=now,
+        updated_at=now,
+    )
+    
+    unified_users[user_id] = user
+    users_by_wallet[request.wallet_address] = user_id
+    
+    return ApiResponse(
+        success=True,
+        message="User created successfully",
+        data=user.model_dump(),
+    )
+
+
+@users_router.get("/{user_id}", response_model=ApiResponse, tags=["users"])
+async def get_user(user_id: str):
+    """GET /api/users/{user_id} - Get user profile by ID."""
+    if user_id not in unified_users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return ApiResponse(
+        success=True,
+        data=unified_users[user_id].model_dump(),
+    )
+
+
+@users_router.put("/{user_id}", response_model=ApiResponse, tags=["users"])
+async def update_user(user_id: str, request: UpdateUserRequest):
+    """PUT /api/users/{user_id} - Update user profile."""
+    if user_id not in unified_users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = unified_users[user_id]
+    
+    if request.email is not None:
+        user.email = request.email
+    if request.phone is not None:
+        user.phone = request.phone
+    if request.display_name is not None:
+        user.display_name = request.display_name
+    if request.roles is not None:
+        user.roles = request.roles
+    if request.platforms is not None:
+        user.platforms = request.platforms
+    
+    user.updated_at = _get_timestamp()
+    unified_users[user_id] = user
+    
+    return ApiResponse(
+        success=True,
+        message="User updated successfully",
+        data=user.model_dump(),
+    )
+
+
+@users_router.delete("/{user_id}", response_model=ApiResponse, tags=["users"])
+async def delete_user(user_id: str):
+    """DELETE /api/users/{user_id} - Delete user profile."""
+    if user_id not in unified_users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = unified_users[user_id]
+    del unified_users[user_id]
+    del users_by_wallet[user.wallet_address]
+    
+    return ApiResponse(
+        success=True,
+        message="User deleted successfully",
+    )
+
+
+@users_router.put("/{user_id}/roles", response_model=ApiResponse, tags=["users"])
+async def update_user_roles(user_id: str, request: UpdateUserRolesRequest):
+    """PUT /api/users/{user_id}/roles - Update user roles for a specific platform."""
+    if user_id not in unified_users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = unified_users[user_id]
+    
+    user.roles = request.roles
+    if request.platform not in user.platforms:
+        user.platforms.append(request.platform)
+    user.updated_at = _get_timestamp()
+    unified_users[user_id] = user
+    
+    _propagate_kyc_to_platforms(user)
+    
+    return ApiResponse(
+        success=True,
+        message=f"Roles updated for user {user_id}",
+        data=user.model_dump(),
+    )
+
+
+@users_router.put("/{user_id}/kyc", response_model=ApiResponse, tags=["users"])
+async def update_kyc_status(
+    user_id: str,
+    kyc_status: KYCStatus,
+    document_type: Optional[str] = None,
+):
+    """PUT /api/users/{user_id}/kyc - Update KYC status and propagate to all platforms."""
+    if user_id not in unified_users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = unified_users[user_id]
+    
+    user.kyc_status = kyc_status
+    if kyc_status == KYCStatus.verified:
+        user.kyc_verified_at = _get_timestamp()
+    if document_type:
+        user.kyc_document_type = document_type
+    user.updated_at = _get_timestamp()
+    unified_users[user_id] = user
+    
+    _propagate_kyc_to_platforms(user)
+    
+    return ApiResponse(
+        success=True,
+        message=f"KYC status updated to {kyc_status.value}",
+        data=user.model_dump(),
+    )
+
+
+@users_router.get("/{user_id}/platforms", response_model=ApiResponse, tags=["users"])
+async def get_user_platforms(user_id: str):
+    """GET /api/users/{user_id}/platforms - Get user's platform access with KYC status."""
+    if user_id not in unified_users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user = unified_users[user_id]
+    
+    platform_status = {}
+    for platform in Platform:
+        platform_status[platform.value] = {
+            "active": platform in user.platforms,
+            "kyc_required": platform != Platform.aadhaar_chain,
+            "kyc_verified": user.kyc_status == KYCStatus.verified if platform != Platform.aadhaar_chain else True,
+        }
+    
+    return ApiResponse(
+        success=True,
+        data={
+            "user_id": user_id,
+            "wallet_address": user.wallet_address,
+            "kyc_status": user.kyc_status.value,
+            "platforms": platform_status,
+        },
+    )
+
+
+def _propagate_kyc_to_platforms(user: UnifiedUserProfile):
+    """Propagate KYC status to role assignments for cross-platform access."""
+    user_id = user.user_id
+    
+    if user.kyc_status == KYCStatus.verified:
+        for platform in user.platforms:
+            platform_str = platform.value if isinstance(platform, Platform) else platform
+            
+            if platform_str not in user_roles.get(user_id, []):
+                if user_id not in user_roles:
+                    user_roles[user_id] = []
+                
+                role = UserRole.buyer if "buyer" in platform_str else UserRole.seller
+                role_assignment = RoleAssignment(
+                    user_id=user_id,
+                    role=role,
+                    platform=platform_str,
+                    assigned_at=_get_timestamp(),
+                    assigned_by="system",
+                )
+                user_roles[user_id].append(role_assignment)

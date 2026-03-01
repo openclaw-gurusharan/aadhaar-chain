@@ -13,7 +13,7 @@ from app.models import (
     VerificationStep,
     ApiResponse,
 )
-from app.routes import router as identity_router
+from app.routes import router as identity_router, auth_router, users_router
 from app.agent_manager import agent_manager
 
 
@@ -39,6 +39,12 @@ app.add_middleware(
 
 # Include identity router (no prefix, router already has prefix)
 app.include_router(identity_router)
+
+# Include auth router for SSO and JWT
+app.include_router(auth_router)
+
+# Include users router for unified user profiles
+app.include_router(users_router)
 
 
 # Startup event: Initialize agents

@@ -303,3 +303,66 @@ class ExternalTokenValidationResponse(BaseModel):
     role: Optional[UserRole] = None
     platform: Optional[str] = None
     error: Optional[str] = None
+
+
+# --- Unified User Profile Models ---
+
+
+class Platform(str, Enum):
+    """OpenClaw platforms."""
+    ondc_buyer = "ondc_buyer"
+    ondc_seller = "ondc_seller"
+    flatwatch = "flatwatch"
+    aadhaar_chain = "aadhaar_chain"
+
+
+class KYCStatus(str, Enum):
+    """KYC verification status."""
+    unverified = "unverified"
+    pending = "pending"
+    verified = "verified"
+    rejected = "rejected"
+
+
+class UnifiedUserProfile(BaseModel):
+    """Unified user profile across all OpenClaw platforms."""
+    user_id: str
+    wallet_address: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    display_name: Optional[str] = None
+    roles: List[UserRole] = []
+    platforms: List[Platform] = []
+    kyc_status: KYCStatus = KYCStatus.unverified
+    kyc_verified_at: Optional[str] = None
+    kyc_document_type: Optional[str] = None
+    created_at: str
+    updated_at: str
+
+
+class CreateUserRequest(BaseModel):
+    """Request to create a new user."""
+    wallet_address: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    display_name: Optional[str] = None
+
+
+class UpdateUserRequest(BaseModel):
+    """Request to update user profile."""
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    display_name: Optional[str] = None
+    roles: Optional[List[UserRole]] = None
+    platforms: Optional[List[Platform]] = None
+
+
+class UpdateUserRolesRequest(BaseModel):
+    """Request to update user roles."""
+    roles: List[UserRole]
+    platform: Platform = Platform.ondc_buyer
+
+
+class UserProfileResponse(BaseModel):
+    """Response with user profile."""
+    user: UnifiedUserProfile
