@@ -195,6 +195,34 @@ class SubmitTransactionRequest(BaseModel):
     transaction_type: str
 
 
+# --- User Profile Models ---
+
+
+class UserProfile(BaseModel):
+    """User profile data."""
+    wallet_address: str
+    username: Optional[str] = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    created_at: str
+    updated_at: str
+
+
+class CreateUserRequest(BaseModel):
+    """Request to create a new user profile."""
+    wallet_address: str
+    username: Optional[str] = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+
+
+class UpdateUserRequest(BaseModel):
+    """Request to update user profile."""
+    username: Optional[str] = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+
+
 # --- Additional Helper Models ---
 
 

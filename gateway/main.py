@@ -14,6 +14,7 @@ from app.models import (
     ApiResponse,
 )
 from app.routes import router as identity_router
+from app.users import router as users_router
 from app.agent_manager import agent_manager
 
 
@@ -39,6 +40,9 @@ app.add_middleware(
 
 # Include identity router (no prefix, router already has prefix)
 app.include_router(identity_router)
+
+# Include users router
+app.include_router(users_router)
 
 
 # Startup event: Initialize agents
