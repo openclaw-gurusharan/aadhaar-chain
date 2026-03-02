@@ -26,8 +26,15 @@ from claude_agent_sdk.types import McpSdkServerConfig
 # Load agent definitions from mcp/agents.py
 import sys
 import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
-from mcp.agents import get_all_agents, get_agent_by_id
+_root_dir = "/workspace/group/workspace/aadhaar-chain"
+if _root_dir not in sys.path:
+    sys.path.insert(0, _root_dir)
+import importlib.util
+_spec = importlib.util.spec_from_file_location("mcp_agents", os.path.join(_root_dir, "mcp", "agents.py"))
+_mcp_agents = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mcp_agents)
+get_all_agents = _mcp_agents.get_all_agents
+get_agent_by_id = _mcp_agents.get_agent_by_id
 
 
 class AgentType(str, Enum):
