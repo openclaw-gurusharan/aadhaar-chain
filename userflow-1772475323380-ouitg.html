@@ -5,75 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
     <style>
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e0e0e0;
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --success-color: #27ae60;
+            --success-hover: #219a52;
+            --danger-color: #e74c3c;
+            --danger-hover: #c0392b;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-hover: 0 2px 6px rgba(0,0,0,0.12);
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 480px;
+            margin: 30px auto;
+            padding: 16px;
         }
         h1 {
             text-align: center;
-            color: #333;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 20px;
+            letter-spacing: -0.3px;
         }
         .input-group {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
         input {
             flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--card-bg);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
         }
         button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+            padding: 10px 16px;
+            background-color: var(--success-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: background-color 0.2s, transform 0.1s;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: var(--success-hover);
+        }
+        button:active {
+            transform: scale(0.98);
         }
         ul {
             list-style-type: none;
             padding: 0;
+            margin: 0;
         }
         li {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            margin: 5px 0;
-            padding: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            margin: 6px 0;
+            padding: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s, opacity 0.2s;
+        }
+        li:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        li .todo-text {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        .item-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .complete-btn {
+            background-color: var(--primary-color);
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        .complete-btn:hover {
+            background-color: var(--primary-hover);
         }
         .delete-btn {
-            background-color: #f44336;
-            padding: 5px 10px;
+            background-color: var(--danger-color);
+            padding: 6px 10px;
             font-size: 12px;
         }
         .delete-btn:hover {
-            background-color: #da190b;
+            background-color: var(--danger-hover);
         }
         .filter-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
         }
         .filter-btn {
-            padding: 8px 16px;
-            margin: 0 5px;
-            background-color: #2196F3;
-            font-size: 14px;
+            padding: 7px 14px;
+            margin: 0;
+            background-color: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            font-size: 12px;
+            font-weight: 500;
         }
         .filter-btn:hover {
-            background-color: #1976D2;
+            background-color: var(--bg-color);
+            color: var(--text-color);
         }
         li.completed {
             text-decoration: line-through;
-            opacity: 0.6;
+            opacity: 0.55;
+        }
+        li.completed .todo-text {
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -101,12 +172,19 @@
             if (text === '') return;
 
             const li = document.createElement('li');
-            li.textContent = text;
             li.dataset.status = 'active';
 
+            const textSpan = document.createElement('span');
+            textSpan.className = 'todo-text';
+            textSpan.textContent = text;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'item-actions';
+
             const completeBtn = document.createElement('button');
-            completeBtn.textContent = 'Complete';
+            completeBtn.textContent = '✓';
             completeBtn.className = 'complete-btn';
+            completeBtn.title = 'Complete';
             completeBtn.onclick = function() {
                 li.classList.toggle('completed');
                 li.dataset.status = li.classList.contains('completed') ? 'completed' : 'active';
@@ -114,14 +192,17 @@
             };
 
             const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'Delete';
+            deleteBtn.textContent = '✕';
             deleteBtn.className = 'delete-btn';
+            deleteBtn.title = 'Delete';
             deleteBtn.onclick = function() {
                 todoList.removeChild(li);
             };
 
-            li.appendChild(completeBtn);
-            li.appendChild(deleteBtn);
+            actionsDiv.appendChild(completeBtn);
+            actionsDiv.appendChild(deleteBtn);
+            li.appendChild(textSpan);
+            li.appendChild(actionsDiv);
             todoList.appendChild(li);
             input.value = '';
             filterTodos();
