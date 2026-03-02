@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px;">
-    <h1 style="text-align: center; color: #333;">Todo List</h1>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button class="filter-btn" data-filter="all" style="padding: 8px 16px; background-color: #2199E8; color: white; border: none; border-radius: 4px; cursor: pointer;">All</button>
-        <button class="filter-btn" data-filter="active" style="padding: 8px 16px; background-color: #ccc; color: #333; border: none; border-radius: 4px; cursor: pointer;">Active</button>
-        <button class="filter-btn" data-filter="completed" style="padding: 8px 16px; background-color: #ccc; color: #333; border: none; border-radius: 4px; cursor: pointer;">Completed</button>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; max-width: 480px; margin: 30px auto; padding: 16px; background-color: #fafafa; color: #333; line-height: 1.5;">
+    <h1 style="text-align: center; color: #1a1a1a; font-size: 24px; font-weight: 600; margin-bottom: 20px; letter-spacing: -0.5px;">Todo List</h1>
+    <div style="display: flex; gap: 6px; margin-bottom: 16px;">
+        <button class="filter-btn" data-filter="all" style="padding: 6px 12px; background-color: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">All</button>
+        <button class="filter-btn" data-filter="active" style="padding: 6px 12px; background-color: #e5e7eb; color: #4b5563; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">Active</button>
+        <button class="filter-btn" data-filter="completed" style="padding: 6px 12px; background-color: #e5e7eb; color: #4b5563; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500;">Completed</button>
     </div>
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <input type="text" id="todoInput" placeholder="Enter todo..." style="flex: 1; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px;">
-        <button id="addBtn" style="padding: 10px 20px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Add</button>
+    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+        <input type="text" id="todoInput" placeholder="Enter todo..." style="flex: 1; padding: 10px 12px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 6px; outline: none; transition: border-color 0.2s;">
+        <button id="addBtn" style="padding: 10px 16px; font-size: 14px; font-weight: 500; background-color: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer;">Add</button>
     </div>
-    <ul id="todoList" style="list-style-type: none; padding: 0;">
+    <ul id="todoList" style="list-style-type: none; padding: 0; margin: 0;">
     </ul>
     <script>
         const input = document.getElementById('todoInput');
@@ -55,31 +55,43 @@
             const text = input.value.trim();
             if (text) {
                 const li = document.createElement('li');
-                li.style.padding = '10px';
-                li.style.borderBottom = '1px solid #eee';
+                li.style.padding = '8px 12px';
+                li.style.borderBottom = '1px solid #e5e7eb';
                 li.style.display = 'flex';
                 li.style.justifyContent = 'space-between';
                 li.style.alignItems = 'center';
+                li.style.backgroundColor = 'white';
+                li.style.borderRadius = '6px';
+                li.style.marginBottom = '6px';
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.style.marginRight = '10px';
+                checkbox.style.width = '16px';
+                checkbox.style.height = '16px';
+                checkbox.style.cursor = 'pointer';
                 checkbox.addEventListener('change', function() {
                     li.classList.toggle('completed', this.checked);
                     li.style.textDecoration = this.checked ? 'line-through' : 'none';
-                    li.style.color = this.checked ? '#999' : '#000';
+                    li.style.color = this.checked ? '#9ca3af' : '#374151';
+                    li.style.opacity = this.checked ? '0.7' : '1';
                     filterTodos();
                 });
 
                 const label = document.createElement('label');
                 label.style.flex = '1';
+                label.style.fontSize = '14px';
+                label.style.color = '#374151';
+                label.style.cursor = 'pointer';
                 label.appendChild(checkbox);
                 label.appendChild(document.createTextNode(text));
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = 'Delete';
-                deleteBtn.style.padding = '5px 10px';
-                deleteBtn.style.backgroundColor = '#f44336';
+                deleteBtn.style.padding = '4px 8px';
+                deleteBtn.style.fontSize = '12px';
+                deleteBtn.style.fontWeight = '500';
+                deleteBtn.style.backgroundColor = '#ef4444';
                 deleteBtn.style.color = 'white';
                 deleteBtn.style.border = 'none';
                 deleteBtn.style.borderRadius = '4px';
