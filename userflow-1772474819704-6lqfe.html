@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px;">
+    <h1 style="text-align: center; color: #333;">Todo List</h1>
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <input type="text" id="todoInput" placeholder="Enter todo..." style="flex: 1; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px;">
+        <button id="addBtn" style="padding: 10px 20px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Add</button>
+    </div>
+    <ul id="todoList" style="list-style-type: none; padding: 0;">
+    </ul>
+    <script>
+        const input = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
+
+        addBtn.addEventListener('click', function() {
+            const text = input.value.trim();
+            if (text) {
+                const li = document.createElement('li');
+                li.textContent = text;
+                li.style.padding = '10px';
+                li.style.border-bottom = '1px solid #eee';
+                li.style.display = 'flex';
+                li.style.justifyContent = 'space-between';
+                li.style.alignItems = 'center';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.style.padding = '5px 10px';
+                deleteBtn.style.backgroundColor = '#f44336';
+                deleteBtn.style.color = 'white';
+                deleteBtn.style.border = 'none';
+                deleteBtn.style.borderRadius = '4px';
+                deleteBtn.style.cursor = 'pointer';
+
+                deleteBtn.addEventListener('click', function() {
+                    todoList.removeChild(li);
+                });
+
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+                input.value = '';
+            }
+        });
+
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
