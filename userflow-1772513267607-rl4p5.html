@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; padding: 20px; }
+        h1 { text-align: center; color: #333; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 10px; font-size: 16px; }
+        button { padding: 10px 20px; font-size: 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f9f9f9; padding: 10px; margin: 5px 0; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .delete-btn { background: #f44336; padding: 5px 10px; font-size: 14px; }
+        .delete-btn:hover { background: #da190b; }
+    </style>
+</head>
+<body>
+    <h1>Todo App</h1>
+    <div class="input-group">
+        <input type="text" id="todoInput" placeholder="Enter todo...">
+        <button id="addBtn">Add</button>
+    </div>
+    <ul id="todoList"></ul>
+
+    <script>
+        const input = document.getElementById('todoInput');
+        const addBtn = document.getElementById('addBtn');
+        const todoList = document.getElementById('todoList');
+
+        addBtn.addEventListener('click', function() {
+            const text = input.value.trim();
+            if (text) {
+                const li = document.createElement('li');
+                li.innerHTML = text + '<button class="delete-btn">Delete</button>';
+                todoList.appendChild(li);
+                input.value = '';
+                
+                li.querySelector('.delete-btn').addEventListener('click', function() {
+                    li.remove();
+                });
+            }
+        });
+
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
