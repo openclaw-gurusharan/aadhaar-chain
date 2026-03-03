@@ -15,10 +15,20 @@
         li { background: #f9f9f9; padding: 10px; margin: 5px 0; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
         .delete-btn { background: #f44336; padding: 5px 10px; font-size: 14px; }
         .delete-btn:hover { background: #da190b; }
+        .complete-btn { background: #FF9800; padding: 5px 10px; font-size: 14px; margin-right: 5px; }
+        .complete-btn:hover { background: #e68900; }
+        .filter-group { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .filter-btn { background: #2196F3; padding: 8px 16px; font-size: 14px; }
+        .filter-btn:hover { background: #0b7dda; }
     </style>
 </head>
 <body>
     <h1>Todo App</h1>
+    <div class="filter-group">
+        <button class="filter-btn" onclick="filterTodos('all')">All</button>
+        <button class="filter-btn" onclick="filterTodos('active')">Active</button>
+        <button class="filter-btn" onclick="filterTodos('completed')">Completed</button>
+    </div>
     <div class="input-group">
         <input type="text" id="todoInput" placeholder="Enter todo...">
         <button id="addBtn">Add</button>
@@ -26,17 +36,39 @@
     <ul id="todoList"></ul>
 
     <script>
+        let currentFilter = 'all';
         const input = document.getElementById('todoInput');
         const addBtn = document.getElementById('addBtn');
         const todoList = document.getElementById('todoList');
+
+        function filterTodos(filter) {
+            currentFilter = filter;
+            const items = todoList.querySelectorAll('li');
+            items.forEach(li => {
+                const isCompleted = li.classList.contains('completed');
+                if (filter === 'all') {
+                    li.style.display = 'flex';
+                } else if (filter === 'active') {
+                    li.style.display = isCompleted ? 'none' : 'flex';
+                } else if (filter === 'completed') {
+                    li.style.display = isCompleted ? 'flex' : 'none';
+                }
+            });
+        }
 
         addBtn.addEventListener('click', function() {
             const text = input.value.trim();
             if (text) {
                 const li = document.createElement('li');
-                li.innerHTML = text + '<button class="delete-btn">Delete</button>';
+                li.innerHTML = '<span class="todo-text">' + text + '</span><div><button class="complete-btn">Complete</button><button class="delete-btn">Delete</button></div>';
                 todoList.appendChild(li);
                 input.value = '';
+                
+                li.querySelector('.complete-btn').addEventListener('click', function() {
+                    li.classList.toggle('completed');
+                    li.querySelector('.todo-text').style.textDecoration = li.classList.contains('completed') ? 'line-through' : 'none';
+                    filterTodos(currentFilter);
+                });
                 
                 li.querySelector('.delete-btn').addEventListener('click', function() {
                     li.remove();
