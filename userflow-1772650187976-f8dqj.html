@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: 40px auto; padding: 20px; }
+    input { padding: 8px; width: 70%; }
+    button { padding: 8px 16px; cursor: pointer; }
+    ul { list-style-type: disc; padding-left: 20px; }
+    li { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Todo List</h1>
+  <input type="text" id="todoInput" placeholder="Enter task">
+  <button onclick="addTodo()">Add</button>
+  <ul id="todoList"></ul>
+  <script>
+    function addTodo() {
+      var input = document.getElementById('todoInput');
+      var text = input.value.trim();
+      if (text) {
+        var li = document.createElement('li');
+        li.textContent = text;
+        document.getElementById('todoList').appendChild(li);
+        input.value = '';
+      }
+    }
+  </script>
+</body>
+</html>
