@@ -205,3 +205,43 @@ def test_get_trust_surface_defaults_to_identity_present_unverified_without_verif
     assert trust["high_trust_eligible"] is False
     assert trust["state_reason"] == "Identity anchor exists, but no approved verification is available yet."
     assert trust["verifications"] == []
+
+
+def test_seed_trust_fixture_supports_full_local_matrix() -> None:
+    identities.clear()
+    agent_manager.verification_records.clear()
+
+    client = TestClient(app)
+    wallet_address = "wallet-fixture"
+
+    expected_states = {
+        "identity_present_unverified": "identity_present_unverified",
+        "verified": "verified",
+        "manual_review": "manual_review",
+        "revoked_or_blocked": "revoked_or_blocked",
+    }
+
+    for fixture_state, expected_state in expected_states.items():
+        response = client.post(
+            f"/api/identity/dev/fixtures/{wallet_address}",
+            json={"fixture_state": fixture_state, "document_type": "aadhaar"},
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["success"] is True
+        assert body["data"]["trust_state"] == expected_state
+
+    response = client.post(
+        f"/api/identity/dev/fixtures/{wallet_address}",
+        json={"fixture_state": "no_identity", "document_type": "aadhaar"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["success"] is True
+    assert body["data"] is None
+
+    identity_response = client.get(f"/api/identity/{wallet_address}")
+    assert identity_response.status_code == 200
+    assert identity_response.json()["data"] is None

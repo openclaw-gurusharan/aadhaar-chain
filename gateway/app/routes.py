@@ -1,21 +1,29 @@
 """Routes for identity operations with agent integration."""
-from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, File, Form, HTTPException, Request, UploadFile
 from typing import Optional
 
 from app.models import (
+    AgentRunProvenance,
     AuditReceiptReference,
     AttestationArtifact,
+    ComplianceVerificationEvidence,
     ConsentArtifact,
+    DocumentVerificationEvidence,
     IdentityData,
     CreateIdentityRequest,
     CreateIdentityResponse,
     DocumentEvidenceSource,
+    FraudVerificationEvidence,
     ReviewArtifact,
     RevocationArtifact,
+    StepStatus,
     TrustReadSurface,
+    TrustFixtureRequest,
     TrustVerificationSummary,
     UpdateIdentityRequest,
+    VerificationMetadata,
     VerificationStatus,
+    VerificationStepDetail,
     VerificationStep,
     AadhaarVerificationData,
     PanVerificationData,
@@ -304,7 +312,153 @@ async def update_identity(
     )
 
 
+@router.post("/dev/fixtures/{wallet_address}", response_model=ApiResponse, tags=["identity"])
+async def seed_trust_fixture(
+    wallet_address: str,
+    request: Request,
+    data: TrustFixtureRequest,
+):
+    """Seed deterministic local trust states for downstream browser validation."""
+    _ensure_local_fixture_access(request)
+    trust_surface = _seed_trust_fixture(wallet_address, data.fixture_state, data.document_type)
+    return ApiResponse(
+        success=True,
+        message=f"Fixture {data.fixture_state} applied",
+        data=trust_surface.model_dump() if trust_surface else None,
+    )
+
+
 # --- Helper Functions ---
+
+
+def _ensure_local_fixture_access(request: Request) -> None:
+    client_host = request.client.host if request.client else None
+    if client_host not in {"127.0.0.1", "::1", "localhost", "testclient", None}:
+        raise HTTPException(status_code=403, detail="Trust fixtures are limited to local development access")
+
+
+def _seed_trust_fixture(
+    wallet_address: str,
+    fixture_state: str,
+    document_type: str,
+) -> Optional[TrustReadSurface]:
+    _clear_wallet_fixture(wallet_address)
+
+    if fixture_state == "no_identity":
+        return None
+
+    identities[wallet_address] = IdentityData(
+        did=_build_did(wallet_address),
+        owner=wallet_address,
+        commitment=f"sha256:{fixture_state}:{wallet_address}",
+        verification_bitmap=1 if fixture_state == "verified" else 0,
+        created_at=_get_timestamp(),
+        updated_at=_get_timestamp(),
+    )
+
+    if fixture_state == "identity_present_unverified":
+        return _build_trust_surface(identities[wallet_address])
+
+    verification_id = f"{document_type}_{wallet_address}_fixture"
+    agent_manager.verification_records[verification_id] = VerificationStatus(
+        verification_id=verification_id,
+        wallet_address=wallet_address,
+        status=_fixture_workflow_status(fixture_state),  # type: ignore[arg-type]
+        current_step=VerificationStep.complete,
+        steps=[
+            VerificationStepDetail(name="document_received", status=StepStatus.completed),
+            VerificationStepDetail(name="parsing", status=StepStatus.completed),
+            VerificationStepDetail(name="fraud_check", status=StepStatus.completed),
+            VerificationStepDetail(name="compliance_check", status=StepStatus.completed),
+            VerificationStepDetail(name="blockchain_upload", status=StepStatus.completed),
+        ],
+        progress=1.0,
+        created_at=_get_timestamp(),
+        updated_at=_get_timestamp(),
+        error=_fixture_reason(fixture_state) if fixture_state == "revoked_or_blocked" else None,
+        metadata=_build_fixture_metadata(fixture_state, document_type),
+    )
+    return _build_trust_surface(identities[wallet_address])
+
+
+def _clear_wallet_fixture(wallet_address: str) -> None:
+    identities.pop(wallet_address, None)
+    for verification_id, status in list(agent_manager.verification_records.items()):
+        if status.wallet_address == wallet_address:
+            del agent_manager.verification_records[verification_id]
+
+
+def _fixture_workflow_status(fixture_state: str) -> str:
+    if fixture_state == "verified":
+        return "verified"
+    if fixture_state == "manual_review":
+        return "manual_review"
+    return "failed"
+
+
+def _fixture_reason(fixture_state: str) -> str:
+    return {
+        "verified": "Verification approved for local trust matrix testing.",
+        "manual_review": "Verification escalated for manual review in local trust matrix testing.",
+        "revoked_or_blocked": "Verification was blocked for local trust matrix testing.",
+    }[fixture_state]
+
+
+def _fixture_provenance(agent_id: str) -> AgentRunProvenance:
+    timestamp = _get_timestamp()
+    return AgentRunProvenance(
+        agent_id=agent_id,
+        status="completed",
+        started_at=timestamp,
+        completed_at=timestamp,
+        tools=[],
+    )
+
+
+def _build_fixture_metadata(fixture_state: str, document_type: str) -> VerificationMetadata:
+    decision = {
+        "verified": "approve",
+        "manual_review": "manual_review",
+        "revoked_or_blocked": "reject",
+    }[fixture_state]
+    consent_provided = document_type == "pan" or fixture_state != "revoked_or_blocked"
+
+    return VerificationMetadata(
+        decision=decision,  # type: ignore[arg-type]
+        reason=_fixture_reason(fixture_state),
+        evidence_status="complete",
+        document=DocumentVerificationEvidence(
+            document_type=document_type,  # type: ignore[arg-type]
+            input_kind="request_payload",
+            source=None,
+            extracted_fields={"document_type": document_type},
+            submitted_claims={"consent_provided": consent_provided},
+            confidence=0.98,
+            warnings=[],
+            required_fields=["name"],
+            missing_fields=[],
+            provenance=_fixture_provenance("document-validator"),
+            gaps=[],
+        ),
+        fraud=FraudVerificationEvidence(
+            risk_score=0.08 if fixture_state == "verified" else 0.62 if fixture_state == "manual_review" else 0.94,
+            risk_level="low" if fixture_state == "verified" else "medium" if fixture_state == "manual_review" else "high",
+            indicators=[] if fixture_state == "verified" else ["identity_mismatch"] if fixture_state == "manual_review" else ["revocation_marker"],
+            recommendation="approve" if fixture_state == "verified" else "manual_review" if fixture_state == "manual_review" else "block",
+            provenance=_fixture_provenance("fraud-detection"),
+            gaps=[],
+        ),
+        compliance=ComplianceVerificationEvidence(
+            aadhaar_act_compliant=fixture_state != "revoked_or_blocked",
+            dpdp_compliant=fixture_state != "revoked_or_blocked",
+            violations=[] if fixture_state != "revoked_or_blocked" else ["local_fixture_revocation"],
+            recommendation="approve" if fixture_state == "verified" else "manual_review" if fixture_state == "manual_review" else "block",
+            provenance=_fixture_provenance("compliance-monitor"),
+            gaps=[],
+        ),
+        blocking_gaps=[],
+        assumptions=["Local trust fixture for deterministic browser validation."],
+    )
 
 
 def _get_timestamp() -> str:

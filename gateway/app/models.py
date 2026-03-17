@@ -248,6 +248,18 @@ class UpdateIdentityRequest(BaseModel):
     verification_bitmap: Optional[int] = Field(default=None, ge=0)
 
 
+class TrustFixtureRequest(BaseModel):
+    """Local development request for seeding deterministic trust states."""
+    fixture_state: Literal[
+        "no_identity",
+        "identity_present_unverified",
+        "verified",
+        "manual_review",
+        "revoked_or_blocked",
+    ]
+    document_type: Literal["aadhaar", "pan"] = "aadhaar"
+
+
 # --- Verification Request Models ---
 
 
