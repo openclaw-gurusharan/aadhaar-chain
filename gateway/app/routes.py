@@ -240,8 +240,12 @@ async def get_identity(
 ):
     """Get identity data for wallet address."""
     if wallet_address not in identities:
-        raise HTTPException(status_code=404, detail="Identity not found")
-    
+        return ApiResponse(
+            success=True,
+            message="Identity not found",
+            data=None,
+        )
+
     return ApiResponse(
         success=True,
         data=identities[wallet_address].model_dump()
@@ -322,16 +326,21 @@ def _build_trust_surface(identity: IdentityData) -> TrustReadSurface:
     ]
     wallet_verifications.sort(key=lambda status: status.updated_at, reverse=True)
     latest_update = wallet_verifications[0].updated_at if wallet_verifications else identity.updated_at
+    verification_summaries = [
+        _to_trust_verification_summary(status)
+        for status in wallet_verifications
+    ]
+    trust_state, state_reason = _derive_portfolio_trust_state(verification_summaries)
 
     return TrustReadSurface(
         wallet_address=identity.owner,
         did=identity.did,
         verification_bitmap=identity.verification_bitmap,
         updated_at=latest_update,
-        verifications=[
-            _to_trust_verification_summary(status)
-            for status in wallet_verifications
-        ],
+        trust_state=trust_state,
+        high_trust_eligible=trust_state == "verified",
+        state_reason=state_reason,
+        verifications=verification_summaries,
     )
 
 
@@ -431,6 +440,32 @@ def _build_review_artifact(status: VerificationStatus) -> ReviewArtifact:
             reason=status.error,
         )
     return ReviewArtifact(status="pending")
+
+
+def _derive_portfolio_trust_state(
+    verifications: list[TrustVerificationSummary],
+) -> tuple[str, Optional[str]]:
+    if not verifications:
+        return "identity_present_unverified", "Identity anchor exists, but no approved verification is available yet."
+
+    for verification in verifications:
+        if verification.revocation.status in {"active", "revoked"}:
+            return "revoked_or_blocked", verification.reason or "Trust state is no longer active."
+        if verification.review.status == "rejected":
+            return "revoked_or_blocked", verification.reason or "Verification was rejected."
+
+    for verification in verifications:
+        if verification.workflow_status == "verified" and verification.review.status == "approved":
+            return "verified", verification.reason or "Verification approved and available for downstream use."
+
+    for verification in verifications:
+        if (
+            verification.workflow_status == "manual_review"
+            or verification.review.status == "manual_review_required"
+        ):
+            return "manual_review", verification.reason or "Verification requires manual review."
+
+    return "identity_present_unverified", verifications[0].reason or "Identity exists, but trust is not yet elevated."
 
 
 async def _read_uploaded_document(

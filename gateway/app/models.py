@@ -193,6 +193,14 @@ class TrustReadSurface(BaseModel):
     did: str
     verification_bitmap: int = 0
     updated_at: str
+    trust_state: Literal[
+        "identity_present_unverified",
+        "verified",
+        "manual_review",
+        "revoked_or_blocked",
+    ]
+    high_trust_eligible: bool = False
+    state_reason: Optional[str] = None
     verifications: List[TrustVerificationSummary] = Field(default_factory=list)
 
 
