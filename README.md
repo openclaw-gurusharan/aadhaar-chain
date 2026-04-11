@@ -1,5 +1,7 @@
 # Aadhaar Chain
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/openclaw-gurusharan/aadhaar-chain)
+
 `aadhaar-chain` is the trust substrate for the workspace.
 
 It is responsible for:

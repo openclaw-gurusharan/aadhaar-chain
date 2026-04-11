@@ -18,15 +18,29 @@ import os
 import re
 import sys
 
-from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
-from claude_agent_sdk.types import (
-    AssistantMessage,
-    ResultMessage,
-    TextBlock,
-    ToolResultBlock,
-    ToolUseBlock,
-    McpStdioServerConfig,
-)
+try:
+    from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
+    from claude_agent_sdk.types import (
+        AssistantMessage,
+        ResultMessage,
+        TextBlock,
+        ToolResultBlock,
+        ToolUseBlock,
+        McpStdioServerConfig,
+    )
+    CLAUDE_AGENT_SDK_AVAILABLE = True
+except ModuleNotFoundError:
+    class ClaudeAgentOptions:  # type: ignore[no-redef]
+        """Minimal options shim for tests when the SDK package is unavailable."""
+
+        def __init__(self, **kwargs: Any) -> None:
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+
+    ClaudeSDKClient = None  # type: ignore[assignment]
+    AssistantMessage = ResultMessage = TextBlock = ToolResultBlock = ToolUseBlock = object  # type: ignore[assignment]
+    McpStdioServerConfig = Dict[str, Any]  # type: ignore[assignment]
+    CLAUDE_AGENT_SDK_AVAILABLE = False
 
 from app.mcp_config import DEFAULT_MCP_SERVERS
 from app.runtime_config import resolve_runtime_policy
@@ -327,6 +341,11 @@ class AgentManager:
         ClaudeSDKClient instances cannot safely service concurrent background tasks.
         Reusing them causes overlapping reads against the same subprocess transport.
         """
+        if ClaudeSDKClient is None:
+            raise RuntimeError(
+                "Claude Agent SDK is not installed in this environment. "
+                "Run the gateway with deterministic fallback mode or install the SDK from the internal source."
+            )
         agent_def = self.agents.get(agent_type)
         if agent_def is None:
             raise ValueError(f"Agent not found: {agent_type}")
