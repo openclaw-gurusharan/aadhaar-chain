@@ -75,7 +75,7 @@ async def health_check() -> JSONResponse:
 @app.get("/api/health", tags=["health"])
 async def api_health_check() -> JSONResponse:
     """Legacy health alias for deployed probes and older consumers."""
-    return await health_check()
+    return JSONResponse(content=await health_check())
 
 
 @app.get("/api/auth/me", tags=["auth"])
