@@ -26,6 +26,11 @@ class Settings(BaseSettings):
         "http://127.0.0.1:43103",
         "http://localhost:43105",
         "http://127.0.0.1:43105",
+        "https://aadharcha.in",
+        "https://www.aadharcha.in",
+        "https://ondcbuyer.aadharcha.in",
+        "https://ondcseller.aadharcha.in",
+        "https://flatwatch.aadharcha.in",
     ]
     cors_allow_credentials: bool = True
     cors_allow_methods: list[str] = ["*"]
