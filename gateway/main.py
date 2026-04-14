@@ -10,7 +10,7 @@ logging.basicConfig(
 )
 
 from config import settings
-from database import init_db, close_db
+from database import init_db, close_db, is_db_available
 from routes import identity, credentials, verification, transaction, grants, auth
 
 
@@ -23,11 +23,11 @@ async def lifespan(app: FastAPI):
 
     # Initialize database with retry logic for Render
     try:
-        await init_db()  # Uses default 15 retries, 2s base delay
+        await init_db(max_retries=3, base_delay=1.0)
         print("Database initialized successfully")
     except Exception as e:
         print(f"Database initialization failed: {e}")
-        raise
+        print("Starting in degraded mode without database connectivity")
 
     yield
 
@@ -69,6 +69,7 @@ async def health_check():
         "version": "2.1.0",
         "solana_rpc": settings.solana_rpc_url,
         "apisetu_env": settings.apisetu_env,
+        "database_available": is_db_available(),
     }
 
 

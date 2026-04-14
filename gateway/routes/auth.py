@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Response, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from database import get_db
+from database import get_db, is_db_available
 from db_models import Identity
 from repositories.identity_repo import IdentityRepository
 from services.session import (
@@ -39,6 +39,14 @@ APP_DISPLAY_NAMES = {
     "ondc_seller": "ONDC Seller Portal",
     "identity_aadhar": "Identity Aadhaar",
 }
+
+
+def _anonymous_validate_response() -> ApiResponse[ValidateResponse]:
+    return ApiResponse(
+        success=True,
+        data=ValidateResponse(valid=False, user=None),
+        message="Authentication session unavailable in degraded mode.",
+    )
 
 
 @router.post("/login", response_model=ApiResponse[LoginResponse])
@@ -136,6 +144,10 @@ async def logout(
     """
     Logout by revoking the current session and clearing the cookie.
     """
+    if not is_db_available():
+        clear_session_cookie(response)
+        return ApiResponse(success=True, data={"message": "Logged out successfully"})
+
     try:
         session_token = request.cookies.get(SESSION_COOKIE_NAME)
 
@@ -166,6 +178,9 @@ async def validate(
 
     Supports both cookie-based auth and Bearer token (for local development).
     """
+    if not is_db_available():
+        return _anonymous_validate_response()
+
     try:
         # Try cookie first
         session_token = request.cookies.get(SESSION_COOKIE_NAME)
@@ -229,6 +244,13 @@ async def get_current_user(
 
     Similar to /validate but returns user directly for simpler client usage.
     """
+    if not is_db_available():
+        return ApiResponse(
+            success=True,
+            data=None,
+            message="No authenticated session is available in degraded mode.",
+        )
+
     try:
         session_token = request.cookies.get(SESSION_COOKIE_NAME)
 

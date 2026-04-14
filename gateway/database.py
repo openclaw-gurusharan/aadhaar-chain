@@ -5,6 +5,7 @@ from config import settings
 from db_base import Base
 
 logger = logging.getLogger(__name__)
+db_available = False
 
 # Create async engine with increased timeout for Render
 engine = create_async_engine(
@@ -47,6 +48,8 @@ async def init_db(max_retries: int = 15, base_delay: float = 2.0):
         try:
             async with engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
+            global db_available
+            db_available = True
             logger.info("Database initialized successfully")
             return
         except Exception as e:
@@ -62,6 +65,10 @@ async def init_db(max_retries: int = 15, base_delay: float = 2.0):
                 f"Retrying in {current_delay:.1f}s..."
             )
             await asyncio.sleep(current_delay)
+
+
+def is_db_available() -> bool:
+    return db_available
 
 
 async def close_db():
